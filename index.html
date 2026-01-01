@@ -1,472 +1,78 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Makhzoun Soft</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <title>نظام مخزون - المؤسسة الاستشفائية</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <!-- Login Page (initially visible) -->
-    <div id="loginPage" class="login-container">
-        <div class="login-card fade-in">
-            <div class="login-header">
-                <div class="login-logo">
-                    <i class="fas fa-boxes"></i>
-                </div>
-                <h1 class="login-title">Makhzoun Soft</h1>
-                <p class="login-subtitle">Connectez-vous à votre compte</p>
-            </div>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label class="form-label" for="username">Nom d'utilisateur</label>
-                    <input type="text" id="username" class="form-control" placeholder="Entrez votre nom d'utilisateur" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="password">Mot de passe</label>
-                    <input type="password" id="password" class="form-control" placeholder="Entrez votre mot de passe" required>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">
-                    <i class="fas fa-sign-in-alt"></i> Se connecter
-                </button>
-            </form>
+<body class="bg-slate-100 text-slate-800 h-screen flex flex-col overflow-hidden">
+
+    <nav class="bg-blue-900 text-white p-4 shadow-lg flex justify-between items-center no-print">
+        <div class="flex items-center gap-3">
+            <div class="font-bold text-2xl tracking-wide">🏥 مخزون (Makhzoun)</div>
         </div>
-    </div>
-
-    <!-- Main Application (initially hidden) -->
-    <div id="app" class="container" style="display: none;">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <i class="fas fa-box"></i>
-                </div>
-                <div class="logo-text">Makhzoun</div>
-            </div>
-            <div class="sidebar-menu">
-                <div class="menu-item active" data-page="dashboard">
-                    <i class="fas fa-home"></i>
-                    <span class="menu-text">Tableau de bord</span>
-                </div>
-                <div class="menu-item" data-page="articles">
-                    <i class="fas fa-boxes"></i>
-                    <span class="menu-text">Articles</span>
-                </div>
-                <div class="menu-item" data-page="movements">
-                    <i class="fas fa-exchange-alt"></i>
-                    <span class="menu-text">Mouvements</span>
-                </div>
-                <div class="menu-item" data-page="inventory">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span class="menu-text">Fiche Inventaire</span>
-                </div>
-                <div class="menu-item" data-page="families">
-                    <i class="fas fa-tags"></i>
-                    <span class="menu-text">Familles</span>
-                </div>
-                <div class="menu-item" data-page="destinations">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span class="menu-text">Destinations</span>
-                </div>
-                <div class="menu-item" data-page="reports">
-                    <i class="fas fa-chart-bar"></i>
-                    <span class="menu-text">Rapports</span>
-                </div>
-                <div class="menu-item" data-page="users">
-                    <i class="fas fa-users"></i>
-                    <span class="menu-text">Utilisateurs</span>
-                </div>
-            </div>
+        <div class="flex gap-2 text-sm font-medium">
+            <button onclick="router('dashboard')" class="nav-btn active">لوحة القيادة</button>
+            <button onclick="router('items')" class="nav-btn">المواد (Articles)</button>
+            <button onclick="router('operations')" class="nav-btn">العمليات (Opérations)</button>
+            <button onclick="router('reports')" class="nav-btn">الوثائق والتقارير</button>
         </div>
+    </nav>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Topbar -->
-            <div class="topbar">
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Rechercher...">
+    <main class="flex-1 overflow-auto p-4 relative" id="main-container">
+        
+        <section id="items" class="page-section hidden">
+            <div class="glass-panel p-4 mb-4 flex justify-between">
+                <h2 class="text-xl font-bold text-blue-800">تسيير المواد</h2>
+                <button onclick="openModal('add-item-modal')" class="btn-primary">+ مادة جديدة</button>
+            </div>
+            <div id="items-grid" class="glass-panel"></div>
+        </section>
+
+        <section id="reports" class="page-section hidden">
+            <div class="grid grid-cols-12 gap-4 h-full">
+                <div class="col-span-3 glass-panel p-4 overflow-y-auto">
+                    <h3 class="font-bold border-b pb-2 mb-2 text-gray-500">وثائق الدخول</h3>
+                    <ul class="space-y-1 text-sm">
+                        <li><button onclick="generateReportView('BON_COMMANDE')" class="report-link">طلب اقتناء (Bon de Commande)</button></li>
+                        <li><button onclick="generateReportView('BON_RECEPTION')" class="report-link">وصل استلام (Bon de Réception)</button></li>
+                        <li><button onclick="generateReportView('PV_RECEPTION')" class="report-link">محضر استلام تقني</button></li>
+                    </ul>
+                    
+                    <h3 class="font-bold border-b pb-2 mb-2 mt-4 text-gray-500">وثائق الخروج</h3>
+                    <ul class="space-y-1 text-sm">
+                        <li><button onclick="generateReportView('DEMANDE_SORTIE')" class="report-link">طلب خروج مواد</button></li>
+                        <li><button onclick="generateReportView('BON_SORTIE')" class="report-link">وصل خروج (Bon de Sortie)</button></li>
+                        <li><button onclick="generateReportView('DECHARGE')" class="report-link">وصل تسليم (Décharge)</button></li>
+                    </ul>
+
+                    <h3 class="font-bold border-b pb-2 mb-2 mt-4 text-gray-500">الجرد والمراقبة</h3>
+                    <ul class="space-y-1 text-sm">
+                        <li><button onclick="generateReportView('FICHE_STOCK')" class="report-link">بطاقة المخزون (Fiche de Stock)</button></li>
+                        <li><button onclick="generateReportView('PV_INVENTAIRE')" class="report-link">محضر الجرد السنوي</button></li>
+                        <li><button onclick="generateReportView('PV_REFORME')" class="report-link text-red-600">محضر إتلاف (PV de Réforme)</button></li>
+                    </ul>
                 </div>
-                <div class="user-actions">
-                    <div class="language-switcher">
-                        <button class="lang-btn active">FR</button>
-                        <button class="lang-btn">AR</button>
-                    </div>
-                    <div class="user-profile">
-                        <div class="avatar">AD</div>
-                        <div>
-                            <div style="font-weight: 600;">Admin User</div>
-                            <div style="font-size: 0.875rem; color: var(--gray);">Administrateur</div>
-                        </div>
+
+                <div class="col-span-9 bg-gray-500 p-8 overflow-y-auto flex justify-center">
+                    <div id="print-area" class="bg-white shadow-2xl min-h-[297mm] w-[210mm] p-[20mm] relative text-black">
+                        <div class="text-center text-gray-400 mt-20">اختر وثيقة من القائمة للمعاينة</div>
                     </div>
                 </div>
             </div>
+            
+            <button onclick="window.print()" class="fixed bottom-8 left-8 bg-blue-600 text-white p-4 rounded-full shadow-xl hover:bg-blue-800 z-50 print:hidden">
+                🖨️ طباعة الوثيقة
+            </button>
+        </section>
 
-            <!-- Content Area -->
-            <div class="content">
-                <!-- Dashboard Page -->
-                <div id="dashboardPage" class="page">
-                    <div class="page-header">
-                        <h1 class="page-title">Tableau de Bord</h1>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Nouvel Article
-                        </button>
-                    </div>
+    </main>
 
-                    <!-- Stats Cards -->
-                    <div class="cards-grid">
-                        <div class="card fade-in">
-                            <div class="card-header">
-                                <div class="card-title">Total Articles</div>
-                                <div class="card-icon bg-primary-light">
-                                    <i class="fas fa-boxes"></i>
-                                </div>
-                            </div>
-                            <div class="card-value">1,248</div>
-                            <div class="card-footer">+12% depuis le mois dernier</div>
-                        </div>
-                        <div class="card fade-in">
-                            <div class="card-header">
-                                <div class="card-title">Valeur Totale</div>
-                                <div class="card-icon bg-success-light">
-                                    <i class="fas fa-euro-sign"></i>
-                                </div>
-                            </div>
-                            <div class="card-value">€245,680</div>
-                            <div class="card-footer">+8% depuis le mois dernier</div>
-                        </div>
-                        <div class="card fade-in">
-                            <div class="card-header">
-                                <div class="card-title">En Stock</div>
-                                <div class="card-icon bg-warning-light">
-                                    <i class="fas fa-warehouse"></i>
-                                </div>
-                            </div>
-                            <div class="card-value">342</div>
-                            <div class="card-footer">-5% depuis le mois dernier</div>
-                        </div>
-                        <div class="card fade-in">
-                            <div class="card-header">
-                                <div class="card-title">Sous Réparation</div>
-                                <div class="card-icon bg-danger-light">
-                                    <i class="fas fa-tools"></i>
-                                </div>
-                            </div>
-                            <div class="card-value">28</div>
-                            <div class="card-footer">+3 depuis hier</div>
-                        </div>
-                    </div>
-
-                    <!-- Recent Movements Table -->
-                    <div class="table-container fade-in">
-                        <div class="table-header">
-                            <h2 class="table-title">Mouvements Récents</h2>
-                            <div class="table-actions">
-                                <button class="btn btn-outline">
-                                    <i class="fas fa-filter"></i> Filtrer
-                                </button>
-                                <button class="btn btn-primary">
-                                    <i class="fas fa-plus"></i> Nouveau Mouvement
-                                </button>
-                            </div>
-                        </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Article</th>
-                                    <th>Type</th>
-                                    <th>De</th>
-                                    <th>À</th>
-                                    <th>Utilisateur</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>15/11/2023</td>
-                                    <td>ORD-001245 (Ordinateur Portable)</td>
-                                    <td><span class="status-badge status-en-usage">Affectation</span></td>
-                                    <td>Stock Central</td>
-                                    <td>Bureau 1 - Département 1</td>
-                                    <td>Ahmed B.</td>
-                                    <td>
-                                        <button class="btn btn-outline" style="padding: 6px 12px;">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>14/11/2023</td>
-                                    <td>MOB-003578 (Bureau Directeur)</td>
-                                    <td><span class="status-badge status-en-usage">Transfert Interne</span></td>
-                                    <td>Bureau 2 - Département 1</td>
-                                    <td>Bureau 3 - Département 2</td>
-                                    <td>Karim T.</td>
-                                    <td>
-                                        <button class="btn btn-outline" style="padding: 6px 12px;">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>13/11/2023</td>
-                                    <td>IMP-007892 (Imprimante Laser)</td>
-                                    <td><span class="status-badge status-sous-reparation">Sortie Réforme</span></td>
-                                    <td>Bureau 5 - Département 3</td>
-                                    <td>Atelier Réparation</td>
-                                    <td>Admin User</td>
-                                    <td>
-                                        <button class="btn btn-outline" style="padding: 6px 12px;">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Articles Page (hidden by default) -->
-                <div id="articlesPage" class="page" style="display: none;">
-                    <div class="page-header">
-                        <h1 class="page-title">Gestion des Articles</h1>
-                        <button class="btn btn-primary" id="newArticleBtn">
-                            <i class="fas fa-plus"></i> Nouvel Article
-                        </button>
-                    </div>
-
-                    <!-- Filters -->
-                    <div class="form-container">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Recherche</label>
-                                <input type="text" class="form-control" placeholder="Code, désignation, n° de série...">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Famille</label>
-                                <select class="form-control">
-                                    <option>Toutes les familles</option>
-                                    <option>FOURNITURE DE BUREAU</option>
-                                    <option>MATERIEL INFORMATIQUE</option>
-                                    <option>MOBILIER DE BUREAU</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Destination</label>
-                                <select class="form-control">
-                                    <option>Toutes les destinations</option>
-                                    <option>EPSP Berriane</option>
-                                    <option>Poly 1</option>
-                                    <option>Département 1</option>
-                                    <option>Bureau 1</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Statut</label>
-                                <select class="form-control">
-                                    <option>Tous les statuts</option>
-                                    <option>En stock</option>
-                                    <option>En usage</option>
-                                    <option>Sous réparation</option>
-                                    <option>Réformé</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Articles Table -->
-                    <div class="table-container">
-                        <div class="table-header">
-                            <h2 class="table-title">Liste des Articles (1,248)</h2>
-                            <div class="table-actions">
-                                <button class="btn btn-outline">
-                                    <i class="fas fa-download"></i> Exporter
-                                </button>
-                                <button class="btn btn-outline">
-                                    <i class="fas fa-print"></i> Imprimer
-                                </button>
-                            </div>
-                        </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Code</th>
-                                    <th>Code Barres</th>
-                                    <th>Désignation FR</th>
-                                    <th>Désignation AR</th>
-                                    <th>Prix</th>
-                                    <th>Famille</th>
-                                    <th>Destination</th>
-                                    <th>Statut</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>ORD-001245</td>
-                                    <td>1234567890123</td>
-                                    <td>Ordinateur Portable Dell</td>
-                                    <td>حاسوب محمول ديل</td>
-                                    <td>€1,250.00</td>
-                                    <td>MATERIEL INFORMATIQUE</td>
-                                    <td>Bureau 1 - Département 1</td>
-                                    <td><span class="status-badge status-en-usage">En usage</span></td>
-                                    <td>
-                                        <button class="btn btn-outline" style="padding: 6px 12px;">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-outline" style="padding: 6px 12px;">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>BUR-005632</td>
-                                    <td>2345678901234</td>
-                                    <td>Bureau Directeur en Bois</td>
-                                    <td>مكتب مدير من الخشب</td>
-                                    <td>€850.00</td>
-                                    <td>MOBILIER DE BUREAU</td>
-                                    <td>Bureau 3 - Département 2</td>
-                                    <td><span class="status-badge status-en-usage">En usage</span></td>
-                                    <td>
-                                        <button class="btn btn-outline" style="padding: 6px 12px;">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-outline" style="padding: 6px 12px;">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>IMP-007892</td>
-                                    <td>3456789012345</td>
-                                    <td>Imprimante Laser HP</td>
-                                    <td>طابعة ليزر إتش بي</td>
-                                    <td>€320.00</td>
-                                    <td>MATERIEL INFORMATIQUE</td>
-                                    <td>Atelier Réparation</td>
-                                    <td><span class="status-badge status-sous-reparation">Sous réparation</span></td>
-                                    <td>
-                                        <button class="btn btn-outline" style="padding: 6px 12px;">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-outline" style="padding: 6px 12px;">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>CHA-009871</td>
-                                    <td>4567890123456</td>
-                                    <td>Chaise Bureau Ergonomique</td>
-                                    <td>كرسي مكتب مريح</td>
-                                    <td>€180.00</td>
-                                    <td>MOBILIER DE BUREAU</td>
-                                    <td>Stock Central</td>
-                                    <td><span class="status-badge status-en-stock">En stock</span></td>
-                                    <td>
-                                        <button class="btn btn-outline" style="padding: 6px 12px;">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-outline" style="padding: 6px 12px;">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Movements Page -->
-                <div id="movementsPage" class="page" style="display: none;">
-                    <div class="page-header">
-                        <h1 class="page-title">Gestion des Mouvements</h1>
-                        <button class="btn btn-primary" id="newMovementBtn">
-                            <i class="fas fa-plus"></i> Nouveau Mouvement
-                        </button>
-                    </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">Mouvements des 30 derniers jours</div>
-                        </div>
-                        <div class="card-value">Cette page est en cours de développement</div>
-                    </div>
-                </div>
-
-                <!-- Other pages would go here with similar structure -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal for New Article -->
-    <div id="articleModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Nouvel Article</h3>
-                <span class="close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="articleForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Code Article</label>
-                            <input type="text" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Code Barres</label>
-                            <input type="text" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Désignation (FR)</label>
-                            <input type="text" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Désignation (AR)</label>
-                            <input type="text" class="form-control" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Prix d'achat</label>
-                            <input type="number" class="form-control" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Numéro de série</label>
-                            <input type="text" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Famille</label>
-                            <select class="form-control" required>
-                                <option value="">Sélectionnez une famille</option>
-                                <option>FOURNITURE DE BUREAU</option>
-                                <option>MATERIEL INFORMATIQUE</option>
-                                <option>MOBILIER DE BUREAU</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Durée de vie (années)</label>
-                            <input type="number" class="form-control">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" id="cancelArticle">Annuler</button>
-                <button class="btn btn-primary" id="saveArticle">Enregistrer</button>
-            </div>
-        </div>
-    </div>
-
+    <script src="reports.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
