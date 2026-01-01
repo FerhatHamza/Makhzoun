@@ -1,75 +1,55 @@
-/* General Styles */
-body { font-family: 'Tajawal', sans-serif; }
-
-.glass-panel {
-    background: white;
-    border: 1px solid #cbd5e1;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    border-radius: 8px;
+/* style.css */
+body { 
+    font-family: 'Tajawal', sans-serif; 
 }
 
-.btn-primary {
-    @apply bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition shadow;
+/* Scrollbar Customization */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* Navigation Items */
+.nav-item {
+    @apply w-full flex items-center gap-3 px-3 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all duration-200 text-sm font-medium text-right;
+    text-align: right; /* ضمان المحاذاة لليمين */
+}
+.nav-item.active {
+    @apply bg-blue-600 text-white shadow-lg shadow-blue-900/50;
+}
+.nav-item .icon {
+    @apply text-lg opacity-80;
 }
 
-.nav-btn {
-    @apply px-3 py-1 rounded hover:bg-blue-800 transition text-blue-100;
-}
-.nav-btn.active {
-    @apply bg-white text-blue-900 font-bold;
+/* Dashboard Cards */
+.stat-card {
+    @apply bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-300;
 }
 
-.report-link {
-    @apply block w-full text-right px-2 py-1 hover:bg-blue-50 rounded hover:text-blue-700 transition;
+/* Badges */
+.badge-in {
+    @apply bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold border border-green-200;
+}
+.badge-out {
+    @apply bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold border border-red-200;
 }
 
-/* Print Specific Styles - أهم جزء للوثائق الرسمية */
+/* Animation */
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Printing adjustments overrides */
 @media print {
-    @page { size: A4; margin: 0; }
-    body { background: white; margin: 0; padding: 0; overflow: visible; height: auto; }
-    .no-print, nav, .page-section > div:first-child, button { display: none !important; }
-    
-    /* إخفاء كل شيء ما عدا منطقة الطباعة */
-    body > * { display: none; }
-    #reports, #reports .col-span-9, #reports #print-area { 
-        display: block !important; 
-        position: absolute; 
-        top: 0; left: 0; 
-        width: 100%; 
-        height: auto; 
-        margin: 0; padding: 10mm; 
-        background: white !important; 
-        overflow: visible !important;
-        box-shadow: none !important;
-    }
-    
-    /* تنسيق الجداول في الطباعة */
-    table.official-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 11pt;
-    }
-    table.official-table th, table.official-table td {
-        border: 1px solid #000;
-        padding: 6px;
-    }
-    table.official-table th {
-        background-color: #f3f4f6 !important; /* لون رمادي فاتح */
-        -webkit-print-color-adjust: exact;
-    }
-}
-
-/* تنسيق الجداول المعروضة */
-.official-header {
-    text-align: center;
-    border-bottom: 2px solid #000;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-}
-.official-title {
-    font-size: 18pt;
-    font-weight: 800;
-    text-decoration: underline;
-    margin: 15px 0;
-    text-align: center;
+    aside, header, .no-print { display: none !important; }
+    main { margin: 0; padding: 0; height: auto; overflow: visible; }
+    #content-area { padding: 0; overflow: visible; }
+    #reports { display: block !important; position: static; height: auto; }
+    .col-span-3 { display: none !important; } /* Hide Sidebar in reports page */
+    .col-span-9 { width: 100% !important; background: white !important; padding: 0 !important; }
+    #print-area { box-shadow: none !important; transform: none !important; margin: 0 !important; width: 100% !important; }
 }
