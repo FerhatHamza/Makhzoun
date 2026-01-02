@@ -3,406 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام تسيير المخزون الاستشفائي</title>
+    <title>نظام مخزون - المؤسسات الصحية</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Tajawal', sans-serif; background-color: #e2e8f0; }
-        
-        /* تصميم التبويبات العلوية */
-        .nav-tab {
-            @apply px-6 py-3 text-sm font-bold text-blue-100 hover:bg-blue-800 transition-colors cursor-pointer border-b-4 border-transparent;
-        }
-        .nav-tab.active {
-            @apply bg-white text-blue-900 border-blue-500;
-        }
-
-        /* الجداول */
-        .data-table { width: 100%; text-align: right; border-collapse: separate; border-spacing: 0; }
-        .data-table th { @apply bg-blue-50 text-blue-800 font-bold p-3 border-b border-blue-200 sticky top-0; }
-        .data-table td { @apply p-3 border-b border-gray-200 hover:bg-blue-50 transition-colors cursor-pointer; }
-        
-        /* تنسيقات الطباعة الدقيقة (A4) */
-        @media print {
-            @page { size: A4; margin: 0; }
-            body * { visibility: hidden; }
-            #print-container, #print-container * { visibility: visible; }
-            #print-container {
-                position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 15mm;
-                background: white; color: black;
-            }
-            .no-print { display: none !important; }
-            
-            table.official-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12pt; }
-            table.official-table th, table.official-table td { border: 1px solid black; padding: 5px; text-align: center; }
-            table.official-table th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; }
-            
-            .header-print { text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 20px; }
-            .signatures { margin-top: 50px; display: flex; justify-content: space-between; page-break-inside: avoid; }
-        }
+        body { font-family: 'Tajawal', sans-serif; background-color: #f3f4f6; }
+        .active-tab { background-color: #10b981; color: white; }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden">
+<body class="text-gray-800">
 
-    <nav class="bg-blue-900 shadow-lg z-10 no-print flex justify-between items-center px-4">
-        <div class="flex items-center gap-4">
-            <div class="text-white font-bold text-xl py-3"><i class="fas fa-hospital-symbol mx-2"></i>نظام مخزون</div>
-            <div class="flex mr-8" id="nav-container">
-                <div onclick="switchTab('dashboard')" class="nav-tab active">لوحة القيادة</div>
-                <div onclick="switchTab('items')" class="nav-tab">المواد (Articles)</div>
-                <div onclick="switchTab('movements')" class="nav-tab">الحركات (Mouvements)</div>
-                <div onclick="switchTab('reports')" class="nav-tab">طباعة الوثائق</div>
+    <!-- Sidebar & Layout -->
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-md hidden md:flex flex-col">
+            <div class="p-6 text-center border-b">
+                <h1 class="text-2xl font-bold text-emerald-600">مخزون</h1>
+                <p class="text-xs text-gray-500">نظام التسيير الاستشفائي</p>
             </div>
-        </div>
-        <div class="text-white text-sm opacity-80">
-            المستخدم: <span class="font-bold">Admin</span>
-        </div>
-    </nav>
-
-    <main class="flex-1 overflow-auto p-4 relative">
-
-        <div id="dashboard" class="tab-content block animate-fade">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                <div class="bg-white p-6 rounded shadow border-r-4 border-blue-600">
-                    <div class="text-gray-500 text-sm">إجمالي المواد</div>
-                    <div class="text-3xl font-bold text-blue-900">1,204</div>
-                </div>
-                <div class="bg-white p-6 rounded shadow border-r-4 border-red-500">
-                    <div class="text-gray-500 text-sm">تنبيهات النفاد</div>
-                    <div class="text-3xl font-bold text-red-600">12</div>
-                    <div class="text-xs text-red-400 mt-1">مواد وصلت للحد الأدنى</div>
-                </div>
-                <div class="bg-white p-6 rounded shadow border-r-4 border-green-500">
-                    <div class="text-gray-500 text-sm">حركات الدخول (شهر)</div>
-                    <div class="text-3xl font-bold text-green-700">45</div>
-                </div>
-                <div class="bg-white p-6 rounded shadow border-r-4 border-orange-500">
-                    <div class="text-gray-500 text-sm">حركات الخروج (شهر)</div>
-                    <div class="text-3xl font-bold text-orange-700">128</div>
-                </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="showView('dashboard')" id="btn-dashboard" class="w-full text-right p-3 rounded hover:bg-emerald-50 active-tab transition flex items-center gap-3">
+                    📊 <span>لوحة القيادة</span>
+                </button>
+                <button onclick="showView('inventory')" id="btn-inventory" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
+                    📦 <span>إدارة المواد (Fiche Stock)</span>
+                </button>
+                <button onclick="showView('entry')" id="btn-entry" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
+                    📥 <span>وصل دخول (Bon Entrée)</span>
+                </button>
+                <button onclick="showView('exit')" id="btn-exit" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
+                    📤 <span>وصل خروج (Bon Sortie)</span>
+                </button>
+                <button onclick="showView('reports')" id="btn-reports" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
+                    📑 <span>التقارير والجرد</span>
+                </button>
+            </nav>
+            <div class="p-4 border-t text-xs text-gray-400 text-center">
+                &copy; 2024 المخزون الصحي الجزائري
             </div>
+        </aside>
 
-            <div class="bg-white rounded shadow overflow-hidden">
-                <div class="bg-gray-50 px-6 py-3 border-b font-bold text-gray-700">آخر 5 عمليات مسجلة</div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>التاريخ</th>
-                            <th>نوع الحركة</th>
-                            <th>رقم الوثيقة</th>
-                            <th>الجهة / المورد</th>
-                            <th>الحالة</th>
-                        </tr>
-                    </thead>
-                    <tbody id="dashboard-rows">
-                        </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="items" class="tab-content hidden">
-            <div class="bg-white rounded shadow h-full flex flex-col">
-                <div class="p-4 border-b flex justify-between items-center bg-gray-50">
-                    <div class="flex gap-2">
-                        <input type="text" placeholder="بحث باسم المادة أو الكود..." class="border p-2 rounded w-64 focus:ring-2 focus:ring-blue-500">
-                        <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"><i class="fas fa-search"></i> بحث</button>
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-8">
+            
+            <!-- Dashboard View -->
+            <div id="view-dashboard" class="view-section">
+                <h2 class="text-2xl font-bold mb-6">نظرة عامة على المخزون</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-lg shadow border-r-4 border-blue-500">
+                        <h3 class="text-gray-500 text-sm">إجمالي المواد</h3>
+                        <p class="text-3xl font-bold mt-2" id="stat-total">0</p>
                     </div>
-                    <button onclick="alert('فتح نموذج إضافة مادة')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 font-bold"><i class="fas fa-plus"></i> إضافة مادة</button>
+                    <div class="bg-white p-6 rounded-lg shadow border-r-4 border-red-500">
+                        <h3 class="text-gray-500 text-sm">تنبيهات نفاذ المخزون</h3>
+                        <p class="text-3xl font-bold mt-2 text-red-600" id="stat-low">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow border-r-4 border-green-500">
+                        <h3 class="text-gray-500 text-sm">قيمة المخزون (دج)</h3>
+                        <p class="text-3xl font-bold mt-2" id="stat-value">0.00</p>
+                    </div>
                 </div>
-                <div class="flex-1 overflow-auto">
-                    <table class="data-table">
-                        <thead>
+            </div>
+
+            <!-- Inventory List View -->
+            <div id="view-inventory" class="view-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">بطاقات المخزون (Fiches de Stock)</h2>
+                    <button onclick="openModal('addItemModal')" class="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700">
+                        + إضافة مادة جديدة
+                    </button>
+                </div>
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <table class="w-full text-right">
+                        <thead class="bg-gray-100 border-b">
                             <tr>
-                                <th>الكود</th>
-                                <th>التعيين (AR)</th>
-                                <th>Désignation (FR)</th>
-                                <th>العائلة</th>
-                                <th>الوحدة</th>
-                                <th>الرصيد</th>
-                                <th>الإجراءات</th>
+                                <th class="p-4">الرمز</th>
+                                <th class="p-4">التسمية (AR)</th>
+                                <th class="p-4">Désignation (FR)</th>
+                                <th class="p-4">الفئة</th>
+                                <th class="p-4">الرصيد الحالي</th>
+                                <th class="p-4">الحالة</th>
                             </tr>
                         </thead>
-                        <tbody id="items-rows">
-                            </tbody>
+                        <tbody id="inventory-table-body">
+                            <!-- JS Populates this -->
+                        </tbody>
                     </table>
                 </div>
             </div>
-        </div>
 
-        <div id="movements" class="tab-content hidden">
-            <div class="grid grid-cols-2 gap-6 h-full">
-                <div class="bg-white rounded shadow p-6 border-t-4 border-green-600">
-                    <h3 class="font-bold text-lg mb-4 text-green-800 border-b pb-2"><i class="fas fa-download"></i> تسجيل دخول (Entrée)</h3>
-                    <form onsubmit="event.preventDefault(); alert('تم الحفظ بنجاح!');">
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm text-gray-600">نوع الوثيقة</label>
-                                <select class="w-full border p-2 rounded bg-gray-50">
-                                    <option>وصل استلام (Bon de Réception)</option>
-                                    <option>فاتورة (Facture)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm text-gray-600">رقم الوثيقة</label>
-                                <input type="text" class="w-full border p-2 rounded">
-                            </div>
-                            <div class="col-span-2">
-                                <label class="block text-sm text-gray-600">المورد (Fournisseur)</label>
-                                <select class="w-full border p-2 rounded bg-gray-50">
-                                    <option>EURL MEDICAL EQUIP</option>
-                                    <option>SARL BUREAU PRO</option>
-                                </select>
-                            </div>
+            <!-- Entry View -->
+            <div id="view-entry" class="view-section hidden">
+                <h2 class="text-2xl font-bold mb-6">تسجيل وصل دخول (Bon d'entrée)</h2>
+                <div class="bg-white p-6 rounded-lg shadow max-w-4xl mx-auto">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm mb-1">المورد</label>
+                            <select class="w-full border p-2 rounded" id="entry-supplier">
+                                <option value="1">مؤسسة سوناطراك (مثال)</option>
+                                <option value="2">صيدلية مركزية</option>
+                            </select>
                         </div>
-                        <div class="bg-green-50 p-4 rounded mb-4">
-                            <label class="block text-sm font-bold mb-1">المادة</label>
-                            <div class="flex gap-2">
-                                <input type="text" placeholder="الكود أو الاسم..." class="flex-1 border p-2 rounded">
-                                <input type="number" placeholder="الكمية" class="w-24 border p-2 rounded">
-                                <button class="bg-green-600 text-white px-3 rounded">+</button>
-                            </div>
-                        </div>
-                        <button class="w-full bg-gray-800 text-white py-2 rounded hover:bg-gray-900">حفظ عملية الدخول</button>
-                    </form>
-                </div>
-
-                <div class="bg-white rounded shadow p-6 border-t-4 border-red-600">
-                    <h3 class="font-bold text-lg mb-4 text-red-800 border-b pb-2"><i class="fas fa-upload"></i> تسجيل خروج (Sortie)</h3>
-                    <form onsubmit="event.preventDefault(); alert('تم الحفظ بنجاح!');">
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div class="col-span-2">
-                                <label class="block text-sm text-gray-600">المصلحة المستفيدة</label>
-                                <select class="w-full border p-2 rounded bg-gray-50">
-                                    <option>مصلحة الاستعجالات</option>
-                                    <option>المخبر المركزي</option>
-                                    <option>المديرية</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm text-gray-600">رقم طلب الخروج</label>
-                                <input type="text" class="w-full border p-2 rounded">
-                            </div>
-                            <div>
-                                <label class="block text-sm text-gray-600">التاريخ</label>
-                                <input type="date" class="w-full border p-2 rounded" value="2026-01-02">
-                            </div>
-                        </div>
-                        <div class="bg-red-50 p-4 rounded mb-4">
-                            <label class="block text-sm font-bold mb-1">المادة</label>
-                            <div class="flex gap-2">
-                                <input type="text" placeholder="الكود أو الاسم..." class="flex-1 border p-2 rounded">
-                                <input type="number" placeholder="الكمية" class="w-24 border p-2 rounded">
-                                <button class="bg-red-600 text-white px-3 rounded">+</button>
-                            </div>
-                        </div>
-                        <button class="w-full bg-gray-800 text-white py-2 rounded hover:bg-gray-900">حفظ عملية الخروج</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div id="reports" class="tab-content hidden h-full">
-            <div class="flex h-full gap-4">
-                <div class="w-1/4 bg-white rounded shadow p-4 overflow-y-auto">
-                    <h3 class="font-bold text-gray-700 mb-4 border-b pb-2">اختر الوثيقة للطباعة</h3>
-                    
-                    <div class="mb-4">
-                        <h4 class="text-xs font-bold text-green-600 uppercase mb-2">وثائق الدخول</h4>
-                        <button onclick="renderDoc('BON_COMMANDE')" class="w-full text-right p-2 text-sm hover:bg-blue-50 rounded block mb-1">1. طلب احتياجات / اقتناء</button>
-                        <button onclick="renderDoc('BON_RECEPTION')" class="w-full text-right p-2 text-sm hover:bg-blue-50 rounded block mb-1">2. وصل استلام (Réception)</button>
-                        <button onclick="renderDoc('PV_RECEPTION')" class="w-full text-right p-2 text-sm hover:bg-blue-50 rounded block mb-1">3. محضر استلام تقني</button>
-                    </div>
-
-                    <div class="mb-4">
-                        <h4 class="text-xs font-bold text-red-600 uppercase mb-2">وثائق الخروج</h4>
-                        <button onclick="renderDoc('DEMANDE_SORTIE')" class="w-full text-right p-2 text-sm hover:bg-blue-50 rounded block mb-1">4. طلب خروج مواد</button>
-                        <button onclick="renderDoc('BON_SORTIE')" class="w-full text-right p-2 text-sm hover:bg-blue-50 rounded block mb-1">5. وصل خروج (Sortie)</button>
-                        <button onclick="renderDoc('DECHARGE')" class="w-full text-right p-2 text-sm hover:bg-blue-50 rounded block mb-1">6. وصل تسليم (Décharge)</button>
-                    </div>
-
-                    <div class="mb-4">
-                        <h4 class="text-xs font-bold text-orange-600 uppercase mb-2">الجرد والمتابعة</h4>
-                        <button onclick="renderDoc('FICHE_STOCK')" class="w-full text-right p-2 text-sm hover:bg-blue-50 rounded block mb-1">7. بطاقة مخزون</button>
-                        <button onclick="renderDoc('PV_INVENTAIRE')" class="w-full text-right p-2 text-sm hover:bg-blue-50 rounded block mb-1">8. محضر جرد سنوي</button>
-                        <button onclick="renderDoc('PV_REFORME')" class="w-full text-right p-2 text-sm hover:bg-blue-50 rounded block mb-1">9. محضر إتلاف</button>
-                    </div>
-                </div>
-
-                <div class="w-3/4 bg-gray-600 p-8 rounded shadow overflow-auto flex justify-center">
-                    <div id="print-container" class="bg-white w-[210mm] min-h-[297mm] p-[20mm] relative shadow-2xl">
-                        <div class="text-center text-gray-400 mt-20">
-                            <i class="fas fa-file-alt text-6xl mb-4"></i>
-                            <p>اختر وثيقة من القائمة للمعاينة والطباعة</p>
+                        <div>
+                            <label class="block text-sm mb-1">رقم الوثيقة المرجعية (فاتورة/وصل)</label>
+                            <input type="text" id="entry-ref" class="w-full border p-2 rounded" placeholder="مثال: FAC-2024/001">
                         </div>
                     </div>
                     
-                    <button onclick="window.print()" class="fixed bottom-8 left-8 bg-blue-600 text-white p-4 rounded-full shadow-xl hover:bg-blue-800 z-50">
-                        <i class="fas fa-print text-xl"></i>
-                    </button>
+                    <div class="border-t pt-4 mt-4">
+                        <h3 class="font-bold mb-2">المواد المستلمة</h3>
+                        <div id="entry-items-container" class="space-y-2">
+                            <!-- Dynamic Rows -->
+                            <div class="flex gap-2">
+                                <select class="border p-2 rounded w-1/3 item-select-entry"><option>اختر المادة...</option></select>
+                                <input type="number" placeholder="الكمية" class="border p-2 rounded w-1/4 entry-qty">
+                                <input type="number" placeholder="السعر" class="border p-2 rounded w-1/4 entry-price">
+                                <input type="date" class="border p-2 rounded w-1/4 entry-expiry">
+                            </div>
+                        </div>
+                        <button onclick="addEntryRow()" class="text-emerald-600 text-sm mt-2 font-bold">+ إضافة سطر آخر</button>
+                    </div>
+
+                    <div class="mt-6">
+                        <button onclick="submitEntry()" class="w-full bg-emerald-600 text-white p-3 rounded font-bold hover:bg-emerald-700">حفظ وصل الدخول وطباعة</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-    </main>
+            <!-- Exit View (Simplified) -->
+            <div id="view-exit" class="view-section hidden">
+                <h2 class="text-2xl font-bold mb-6">تسجيل وصل خروج (Bon de Sortie)</h2>
+                <div class="bg-white p-6 rounded-lg shadow max-w-4xl mx-auto">
+                    <p class="mb-4 text-gray-600">اختر المصلحة الطالبة والمواد المراد صرفها.</p>
+                    <div class="mb-4">
+                        <label class="block text-sm mb-1">المصلحة / القسم</label>
+                        <select class="w-full border p-2 rounded" id="exit-dept">
+                            <option value="1">مصلحة الاستعجالات</option>
+                            <option value="2">مخبر التحاليل</option>
+                        </select>
+                    </div>
+                    <!-- Items selection logic similar to Entry would go here -->
+                    <button class="bg-blue-600 text-white px-6 py-2 rounded">تأكيد الصرف</button>
+                </div>
+            </div>
 
-    <script>
-        // 1. Navigation Logic
-        function switchTab(tabId) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+        </main>
+    </div>
+
+    <!-- Add Item Modal -->
+    <div id="addItemModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h3 class="text-xl font-bold mb-4">إضافة مادة جديدة</h3>
+            <input type="text" id="new-code" placeholder="الرمز (Code)" class="w-full border p-2 mb-2 rounded">
+            <input type="text" id="new-name-ar" placeholder="الاسم بالعربية" class="w-full border p-2 mb-2 rounded">
+            <input type="text" id="new-name-fr" placeholder="Nom en Français" class="w-full border p-2 mb-2 rounded text-left" dir="ltr">
+            <select id="new-cat" class="w-full border p-2 mb-2 rounded">
+                <option value="1">قرطاسية</option>
+                <option value="2">أجهزة تقنية</option>
+            </select>
+            <input type="number" id="new-min" placeholder="الحد الأدنى" class="w-full border p-2 mb-4 rounded">
             
-            // Show selected tab
-            document.getElementById(tabId).classList.remove('hidden');
-            // Activate button style (rough selector for demo)
-            const index = ['dashboard', 'items', 'movements', 'reports'].indexOf(tabId);
-            document.querySelectorAll('.nav-tab')[index].classList.add('active');
-        }
-
-        // 2. Data Initialization (Mock Data)
-        const mockItems = [
-            { code: 'MED-101', ar: 'كمامات جراحية', fr: 'Masques chirurgicaux', fam: 'مستهلكات طبية', unit: 'علبة', stock: 500 },
-            { code: 'MED-102', ar: 'قفازات معقمة', fr: 'Gants stériles', fam: 'مستهلكات طبية', unit: 'زوج', stock: 120 },
-            { code: 'BUR-001', ar: 'ورق A4', fr: 'Papier A4', fam: 'قرطاسية', unit: 'رزمة', stock: 45 },
-            { code: 'BUR-002', ar: 'قلم جاف أزرق', fr: 'Stylo bleu', fam: 'قرطاسية', unit: 'وحدة', stock: 100 },
-            { code: 'INFO-99', ar: 'خرطوشة حبر HP', fr: 'Toner HP 85A', fam: 'إعلام آلي', unit: 'وحدة', stock: 3 },
-            { code: 'MAT-55', ar: 'جهاز قياس الضغط', fr: 'Tensiomètre', fam: 'أجهزة طبية', unit: 'وحدة', stock: 8 },
-        ];
-
-        const mockHistory = [
-            { date: '2026-01-02', type: 'خروج', doc: 'BON-22', party: 'مصلحة الأشعة', status: 'مكتمل' },
-            { date: '2026-01-01', type: 'دخول', doc: 'REC-105', party: 'EURL MED SUPPLIES', status: 'مكتمل' },
-            { date: '2025-12-30', type: 'خروج', doc: 'BON-21', party: 'الإدارة العامة', status: 'مكتمل' },
-        ];
-
-        // 3. Populate Tables
-        function initData() {
-            // Dashboard Rows
-            const dashRows = document.getElementById('dashboard-rows');
-            mockHistory.forEach(h => {
-                const color = h.type === 'دخول' ? 'text-green-600' : 'text-red-600';
-                dashRows.innerHTML += `
-                    <tr>
-                        <td class="text-gray-600 text-sm">${h.date}</td>
-                        <td class="font-bold ${color}">${h.type}</td>
-                        <td class="text-sm">${h.doc}</td>
-                        <td class="text-sm">${h.party}</td>
-                        <td><span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">✔ ${h.status}</span></td>
-                    </tr>
-                `;
-            });
-
-            // Items Rows
-            const itemRows = document.getElementById('items-rows');
-            mockItems.forEach(item => {
-                const stockClass = item.stock < 10 ? 'bg-red-100 text-red-700 font-bold' : '';
-                itemRows.innerHTML += `
-                    <tr>
-                        <td class="font-mono text-sm">${item.code}</td>
-                        <td class="font-bold text-gray-800">${item.ar}</td>
-                        <td class="text-gray-500 text-sm">${item.fr}</td>
-                        <td class="text-sm">${item.fam}</td>
-                        <td class="text-center text-sm">${item.unit}</td>
-                        <td class="text-center ${stockClass}">${item.stock}</td>
-                        <td class="text-center">
-                            <button class="text-blue-600 hover:text-blue-800 text-sm underline">بطاقة</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        // 4. Document Generator Engine (The "Magic" part)
-        const HEADER_HTML = `
-            <div class="header-print">
-                <h3 class="text-sm">الجمهورية الجزائرية الديمقراطية الشعبية</h3>
-                <h4 class="text-sm font-bold">وزارة الصحة والسكان وإصلاح المستشفيات</h4>
-                <h4 class="text-lg font-bold mt-2">المؤسسة العمومية للصحة الجوارية - بريان</h4>
-                <div class="flex justify-between mt-4 text-xs">
-                    <span>الرقم الجبائي: 000111222333</span>
-                    <span>المخزن العام</span>
-                    <span>السنة المالية: 2026</span>
-                </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('addItemModal')" class="px-4 py-2 text-gray-600">إلغاء</button>
+                <button onclick="saveNewItem()" class="px-4 py-2 bg-emerald-600 text-white rounded">حفظ</button>
             </div>
-        `;
+        </div>
+    </div>
 
-        function renderDoc(type) {
-            let content = HEADER_HTML;
-            let title = '';
-            let meta = '';
-            let table = '';
-            let signatures = '';
-
-            // Configuration for each document type
-            if (type === 'BON_COMMANDE') {
-                title = 'سند طلب (Bon de Commande)';
-                meta = `
-                    <div class="flex justify-between border p-2 mb-4 text-sm">
-                        <div><strong>إلى المورد:</strong> EURL MEDICAL EQUIP</div>
-                        <div><strong>التاريخ:</strong> 02/01/2026</div>
-                        <div><strong>رقم السند:</strong> 001/2026</div>
-                    </div>`;
-                table = `
-                    <thead><tr><th>ر.ت</th><th>التعيين</th><th>الوحدة</th><th>الكمية</th><th>ملاحظات</th></tr></thead>
-                    <tbody>
-                        <tr><td>1</td><td>قفازات معقمة</td><td>علبة</td><td>100</td><td></td></tr>
-                        <tr><td>2</td><td>ضمادات طبية</td><td>وحدة</td><td>500</td><td></td></tr>
-                    </tbody>`;
-                signatures = `<div class="signatures"><div>المقتصد</div><div>المدير</div></div>`;
-            } 
-            else if (type === 'BON_SORTIE') {
-                title = 'وصل خروج مواد (Bon de Sortie)';
-                meta = `
-                    <div class="flex justify-between border p-2 mb-4 text-sm">
-                        <div><strong>المصلحة المستفيدة:</strong> مصلحة الاستعجالات</div>
-                        <div><strong>طالب المواد:</strong> رئيس المصلحة</div>
-                        <div><strong>التاريخ:</strong> 02/01/2026</div>
-                    </div>`;
-                table = `
-                    <thead><tr><th>ر.ت</th><th>الرمز</th><th>البيان (Désignation)</th><th>الكمية المطلوبة</th><th>الكمية الممنوحة</th><th>ملاحظات</th></tr></thead>
-                    <tbody>
-                        <tr><td>1</td><td>MED-101</td><td>كمامات جراحية</td><td>50</td><td>50</td><td></td></tr>
-                        <tr><td>2</td><td>MED-55</td><td>كحول طبي 90°</td><td>10</td><td>10</td><td>لتر</td></tr>
-                    </tbody>`;
-                signatures = `<div class="signatures"><div>المستلم</div><div>أمين المخزن</div><div>المدير</div></div>`;
-            }
-            else if (type === 'FICHE_STOCK') {
-                title = 'بطاقة المخزون (Fiche de Stock)';
-                meta = `
-                    <div class="grid grid-cols-2 gap-4 border p-2 mb-4 text-sm">
-                        <div><strong>المادة:</strong> ورق طباعة A4</div>
-                        <div><strong>الرمز:</strong> BUR-001</div>
-                        <div><strong>الحد الأدنى:</strong> 10</div>
-                        <div><strong>المكان:</strong> الرف B-12</div>
-                    </div>`;
-                table = `
-                    <thead>
-                        <tr><th rowspan="2">التاريخ</th><th rowspan="2">العملية</th><th rowspan="2">المرجع</th><th colspan="3">الكمية</th><th rowspan="2">التأشيرة</th></tr>
-                        <tr><th>دخول</th><th>خروج</th><th>رصيد</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>01/01</td><td>رصيد أولي</td><td>جرد</td><td>-</td><td>-</td><td>50</td><td></td></tr>
-                        <tr><td>02/01</td><td>خروج</td><td>وصل 12</td><td>-</td><td>5</td><td>45</td><td></td></tr>
-                    </tbody>`;
-                signatures = `<div class="signatures"><div>أمين المخزن</div><div>المراقب</div></div>`;
-            }
-
-            // Build Final HTML
-            content += `<h1 class="text-2xl font-bold text-center underline mb-6">${title}</h1>`;
-            content += meta;
-            content += `<table class="official-table">${table}</table>`;
-            content += `<div class="mt-12 w-full">${signatures}</div>`;
-
-            document.getElementById('print-container').innerHTML = content;
-        }
-
-        // Initialize on Load
-        document.addEventListener('DOMContentLoaded', () => {
-            initData();
-        });
-
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
+
+
