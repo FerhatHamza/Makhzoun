@@ -9,164 +9,203 @@
     <style>
         body { font-family: 'Tajawal', sans-serif; background-color: #f3f4f6; }
         .active-tab { background-color: #10b981; color: white; }
+        /* Hide scrollbar for cleaner look */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800 bg-gray-50 h-screen flex flex-col md:flex-row overflow-hidden">
 
-    <!-- Sidebar & Layout -->
-    <div class="flex h-screen overflow-hidden">
+    <!-- Mobile Header -->
+    <header class="md:hidden bg-white shadow-sm p-4 flex justify-between items-center z-20 shrink-0">
+        <h1 class="text-xl font-bold text-emerald-600">مخزون</h1>
+        <button onclick="toggleSidebar()" class="p-2 text-gray-600 focus:outline-none bg-gray-100 rounded-md">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+    </header>
+
+    <!-- Overlay for Mobile Sidebar -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden transition-opacity"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed inset-y-0 right-0 z-40 w-64 bg-white shadow-xl transform translate-x-full md:translate-x-0 md:static md:flex md:flex-col transition-transform duration-300 ease-in-out h-full">
+        <div class="p-6 text-center border-b hidden md:block">
+            <h1 class="text-2xl font-bold text-emerald-600">مخزون</h1>
+            <p class="text-xs text-gray-500">نظام التسيير الاستشفائي</p>
+        </div>
         
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-md hidden md:flex flex-col">
-            <div class="p-6 text-center border-b">
-                <h1 class="text-2xl font-bold text-emerald-600">مخزون</h1>
-                <p class="text-xs text-gray-500">نظام التسيير الاستشفائي</p>
-            </div>
-            <nav class="flex-1 p-4 space-y-2">
-                <button onclick="showView('dashboard')" id="btn-dashboard" class="w-full text-right p-3 rounded hover:bg-emerald-50 active-tab transition flex items-center gap-3">
-                    📊 <span>لوحة القيادة</span>
-                </button>
-                <button onclick="showView('inventory')" id="btn-inventory" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
-                    📦 <span>إدارة المواد (Fiche Stock)</span>
-                </button>
-                <button onclick="showView('entry')" id="btn-entry" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
-                    📥 <span>وصل دخول (Bon Entrée)</span>
-                </button>
-                <button onclick="showView('exit')" id="btn-exit" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
-                    📤 <span>وصل خروج (Bon Sortie)</span>
-                </button>
-                <button onclick="showView('reports')" id="btn-reports" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
-                    📑 <span>التقارير والجرد</span>
-                </button>
-            </nav>
-            <div class="p-4 border-t text-xs text-gray-400 text-center">
-                &copy; 2024 المخزون الصحي الجزائري
-            </div>
-        </aside>
+        <!-- Mobile Close Button inside Sidebar -->
+        <div class="md:hidden p-4 flex justify-end">
+            <button onclick="toggleSidebar()" class="text-gray-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
 
-        <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto p-8">
-            
-            <!-- Dashboard View -->
-            <div id="view-dashboard" class="view-section">
-                <h2 class="text-2xl font-bold mb-6">نظرة عامة على المخزون</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-lg shadow border-r-4 border-blue-500">
-                        <h3 class="text-gray-500 text-sm">إجمالي المواد</h3>
-                        <p class="text-3xl font-bold mt-2" id="stat-total">0</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow border-r-4 border-red-500">
-                        <h3 class="text-gray-500 text-sm">تنبيهات نفاذ المخزون</h3>
-                        <p class="text-3xl font-bold mt-2 text-red-600" id="stat-low">0</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow border-r-4 border-green-500">
-                        <h3 class="text-gray-500 text-sm">قيمة المخزون (دج)</h3>
-                        <p class="text-3xl font-bold mt-2" id="stat-value">0.00</p>
-                    </div>
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+            <button onclick="showView('dashboard')" id="btn-dashboard" class="w-full text-right p-3 rounded hover:bg-emerald-50 active-tab transition flex items-center gap-3">
+                <span>📊</span> <span>لوحة القيادة</span>
+            </button>
+            <button onclick="showView('inventory')" id="btn-inventory" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
+                <span>📦</span> <span>إدارة المواد</span>
+            </button>
+            <button onclick="showView('entry')" id="btn-entry" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
+                <span>📥</span> <span>وصل دخول</span>
+            </button>
+            <button onclick="showView('exit')" id="btn-exit" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
+                <span>📤</span> <span>وصل خروج</span>
+            </button>
+            <button onclick="showView('reports')" id="btn-reports" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
+                <span>📑</span> <span>التقارير والجرد</span>
+            </button>
+        </nav>
+        <div class="p-4 border-t text-xs text-gray-400 text-center hidden md:block">
+            &copy; 2024 المخزون الصحي
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 w-full relative" id="main-content">
+        
+        <!-- Dashboard View -->
+        <div id="view-dashboard" class="view-section space-y-6">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800">نظرة عامة</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm border-r-4 border-blue-500">
+                    <h3 class="text-gray-500 text-sm font-medium">إجمالي المواد</h3>
+                    <p class="text-3xl font-bold mt-2 text-gray-800" id="stat-total">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border-r-4 border-red-500">
+                    <h3 class="text-gray-500 text-sm font-medium">تنبيهات نفاذ المخزون</h3>
+                    <p class="text-3xl font-bold mt-2 text-red-600" id="stat-low">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border-r-4 border-green-500">
+                    <h3 class="text-gray-500 text-sm font-medium">قيمة المخزون (دج)</h3>
+                    <p class="text-2xl md:text-3xl font-bold mt-2 text-gray-800 truncate" id="stat-value">0.00</p>
                 </div>
             </div>
+        </div>
 
-            <!-- Inventory List View -->
-            <div id="view-inventory" class="view-section hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold">بطاقات المخزون (Fiches de Stock)</h2>
-                    <button onclick="openModal('addItemModal')" class="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700">
-                        + إضافة مادة جديدة
-                    </button>
-                </div>
-                <div class="bg-white rounded-lg shadow overflow-hidden">
-                    <table class="w-full text-right">
-                        <thead class="bg-gray-100 border-b">
+        <!-- Inventory List View -->
+        <div id="view-inventory" class="view-section hidden space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800">بطاقات المخزون</h2>
+                <button onclick="openModal('addItemModal')" class="w-full sm:w-auto bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 shadow-sm transition">
+                    + إضافة مادة
+                </button>
+            </div>
+            <!-- Responsive Table Container -->
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right min-w-[600px]">
+                        <thead class="bg-gray-50 border-b">
                             <tr>
-                                <th class="p-4">الرمز</th>
-                                <th class="p-4">التسمية (AR)</th>
-                                <th class="p-4">Désignation (FR)</th>
-                                <th class="p-4">الفئة</th>
-                                <th class="p-4">الرصيد الحالي</th>
-                                <th class="p-4">الحالة</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">الرمز</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">التسمية</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">FR</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">الفئة</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">الرصيد</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">الحالة</th>
                             </tr>
                         </thead>
-                        <tbody id="inventory-table-body">
+                        <tbody id="inventory-table-body" class="divide-y divide-gray-100">
                             <!-- JS Populates this -->
                         </tbody>
                     </table>
                 </div>
             </div>
+        </div>
 
-            <!-- Entry View -->
-            <div id="view-entry" class="view-section hidden">
-                <h2 class="text-2xl font-bold mb-6">تسجيل وصل دخول (Bon d'entrée)</h2>
-                <div class="bg-white p-6 rounded-lg shadow max-w-4xl mx-auto">
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block text-sm mb-1">المورد</label>
-                            <select class="w-full border p-2 rounded" id="entry-supplier">
-                                <option value="1">مؤسسة سوناطراك (مثال)</option>
-                                <option value="2">صيدلية مركزية</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm mb-1">رقم الوثيقة المرجعية (فاتورة/وصل)</label>
-                            <input type="text" id="entry-ref" class="w-full border p-2 rounded" placeholder="مثال: FAC-2024/001">
-                        </div>
-                    </div>
-                    
-                    <div class="border-t pt-4 mt-4">
-                        <h3 class="font-bold mb-2">المواد المستلمة</h3>
-                        <div id="entry-items-container" class="space-y-2">
-                            <!-- Dynamic Rows -->
-                            <div class="flex gap-2">
-                                <select class="border p-2 rounded w-1/3 item-select-entry"><option>اختر المادة...</option></select>
-                                <input type="number" placeholder="الكمية" class="border p-2 rounded w-1/4 entry-qty">
-                                <input type="number" placeholder="السعر" class="border p-2 rounded w-1/4 entry-price">
-                                <input type="date" class="border p-2 rounded w-1/4 entry-expiry">
-                            </div>
-                        </div>
-                        <button onclick="addEntryRow()" class="text-emerald-600 text-sm mt-2 font-bold">+ إضافة سطر آخر</button>
-                    </div>
-
-                    <div class="mt-6">
-                        <button onclick="submitEntry()" class="w-full bg-emerald-600 text-white p-3 rounded font-bold hover:bg-emerald-700">حفظ وصل الدخول وطباعة</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Exit View (Simplified) -->
-            <div id="view-exit" class="view-section hidden">
-                <h2 class="text-2xl font-bold mb-6">تسجيل وصل خروج (Bon de Sortie)</h2>
-                <div class="bg-white p-6 rounded-lg shadow max-w-4xl mx-auto">
-                    <p class="mb-4 text-gray-600">اختر المصلحة الطالبة والمواد المراد صرفها.</p>
-                    <div class="mb-4">
-                        <label class="block text-sm mb-1">المصلحة / القسم</label>
-                        <select class="w-full border p-2 rounded" id="exit-dept">
-                            <option value="1">مصلحة الاستعجالات</option>
-                            <option value="2">مخبر التحاليل</option>
+        <!-- Entry View -->
+        <div id="view-entry" class="view-section hidden space-y-6">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800">تسجيل وصل دخول</h2>
+            <div class="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">المورد</label>
+                        <select class="w-full border-gray-300 border p-2.5 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" id="entry-supplier">
+                            <option value="1">مؤسسة سوناطراك</option>
+                            <option value="2">صيدلية مركزية</option>
                         </select>
                     </div>
-                    <!-- Items selection logic similar to Entry would go here -->
-                    <button class="bg-blue-600 text-white px-6 py-2 rounded">تأكيد الصرف</button>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">مرجع الوثيقة</label>
+                        <input type="text" id="entry-ref" class="w-full border-gray-300 border p-2.5 rounded-lg" placeholder="مثال: FAC-001">
+                    </div>
+                </div>
+                
+                <div class="border-t pt-4">
+                    <h3 class="font-bold text-gray-800 mb-3">المواد</h3>
+                    <div id="entry-items-container" class="space-y-3">
+                        <!-- Dynamic Rows (Responsive Grid) -->
+                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                            <div class="sm:col-span-4">
+                                <label class="block text-xs text-gray-500 mb-1 sm:hidden">المادة</label>
+                                <select class="w-full border p-2 rounded item-select-entry"><option>اختر المادة...</option></select>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs text-gray-500 mb-1 sm:hidden">الكمية</label>
+                                <input type="number" placeholder="الكمية" class="w-full border p-2 rounded entry-qty">
+                            </div>
+                            <div class="sm:col-span-3">
+                                <label class="block text-xs text-gray-500 mb-1 sm:hidden">السعر</label>
+                                <input type="number" placeholder="السعر" class="w-full border p-2 rounded entry-price">
+                            </div>
+                            <div class="sm:col-span-3">
+                                <label class="block text-xs text-gray-500 mb-1 sm:hidden">تاريخ الصلاحية</label>
+                                <input type="date" class="w-full border p-2 rounded entry-expiry">
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="addEntryRow()" class="mt-3 text-emerald-600 font-medium text-sm flex items-center hover:text-emerald-700">
+                        <span class="text-lg mr-1">+</span> إضافة سطر آخر
+                    </button>
+                </div>
+
+                <div class="mt-8">
+                    <button onclick="submitEntry()" class="w-full bg-emerald-600 text-white py-3 px-4 rounded-lg font-bold hover:bg-emerald-700 shadow-sm transition">
+                        حفظ الوصل
+                    </button>
                 </div>
             </div>
+        </div>
 
-        </main>
-    </div>
+        <!-- Exit View -->
+        <div id="view-exit" class="view-section hidden space-y-6">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800">تسجيل وصل خروج</h2>
+            <div class="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">المصلحة الطالبة</label>
+                    <select class="w-full border p-2.5 rounded-lg" id="exit-dept">
+                        <option value="1">مصلحة الاستعجالات</option>
+                        <option value="2">مخبر التحاليل</option>
+                    </select>
+                </div>
+                <div class="bg-blue-50 p-4 rounded text-blue-800 text-sm mb-6">
+                    قيد التطوير: يتم اختيار المواد بنفس طريقة وصل الدخول مع التحقق من الرصيد.
+                </div>
+                <button class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 shadow-sm">تأكيد الصرف</button>
+            </div>
+        </div>
 
-    <!-- Add Item Modal -->
-    <div id="addItemModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h3 class="text-xl font-bold mb-4">إضافة مادة جديدة</h3>
-            <input type="text" id="new-code" placeholder="الرمز (Code)" class="w-full border p-2 mb-2 rounded">
-            <input type="text" id="new-name-ar" placeholder="الاسم بالعربية" class="w-full border p-2 mb-2 rounded">
-            <input type="text" id="new-name-fr" placeholder="Nom en Français" class="w-full border p-2 mb-2 rounded text-left" dir="ltr">
-            <select id="new-cat" class="w-full border p-2 mb-2 rounded">
-                <option value="1">قرطاسية</option>
-                <option value="2">أجهزة تقنية</option>
-            </select>
-            <input type="number" id="new-min" placeholder="الحد الأدنى" class="w-full border p-2 mb-4 rounded">
-            
-            <div class="flex justify-end gap-2">
-                <button onclick="closeModal('addItemModal')" class="px-4 py-2 text-gray-600">إلغاء</button>
-                <button onclick="saveNewItem()" class="px-4 py-2 bg-emerald-600 text-white rounded">حفظ</button>
+    </main>
+
+    <!-- Modal (Responsive) -->
+    <div id="addItemModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all">
+            <div class="p-6 border-b">
+                <h3 class="text-xl font-bold text-gray-800">إضافة مادة جديدة</h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <input type="text" id="new-code" placeholder="الرمز (Code)" class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                <input type="text" id="new-name-ar" placeholder="الاسم بالعربية" class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                <input type="text" id="new-name-fr" placeholder="Nom en Français" class="w-full border p-3 rounded-lg text-left focus:ring-2 focus:ring-emerald-500 outline-none" dir="ltr">
+                <select id="new-cat" class="w-full border p-3 rounded-lg bg-white">
+                    <option value="1">قرطاسية</option>
+                    <option value="2">أجهزة تقنية</option>
+                </select>
+                <input type="number" id="new-min" placeholder="الحد الأدنى للتنبيه" class="w-full border p-3 rounded-lg">
+            </div>
+            <div class="p-6 border-t bg-gray-50 flex justify-end gap-3 rounded-b-xl">
+                <button onclick="closeModal('addItemModal')" class="px-5 py-2.5 text-gray-600 bg-white border rounded-lg hover:bg-gray-50">إلغاء</button>
+                <button onclick="saveNewItem()" class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 shadow-sm">حفظ</button>
             </div>
         </div>
     </div>
@@ -174,5 +213,4 @@
     <script src="app.js"></script>
 </body>
 </html>
-
 
