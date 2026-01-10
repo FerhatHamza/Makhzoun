@@ -40,8 +40,12 @@
         </div>
 
         <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+            
             <button onclick="showView('dashboard')" id="btn-dashboard" class="w-full text-right p-3 rounded hover:bg-emerald-50 active-tab transition flex items-center gap-3">
                 <span>📊</span> <span>لوحة القيادة</span>
+            </button>
+            <button onclick="showView('categories')" id="btn-categories" class="w-full text-right p-3 rounded hover:bg-emerald-50 active-tab transition flex items-center gap-3">
+                <span>📊</span> <span>ادارة الفئات</span>
             </button>
             <button onclick="showView('inventory')" id="btn-inventory" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
                 <span>📦</span> <span>إدارة المواد</span>
@@ -64,6 +68,8 @@
     <!-- Main Content -->
     <main class="flex-1 overflow-y-auto p-4 md:p-8 w-full relative" id="main-content">
         
+        
+
         <!-- Dashboard View -->
         <div id="view-dashboard" class="view-section space-y-6">
             <h2 class="text-xl md:text-2xl font-bold text-gray-800">نظرة عامة</h2>
@@ -83,6 +89,37 @@
             </div>
         </div>
 
+
+        <!-- categories View -->
+        <div id="view-categories" class="view-section space-y-6">
+           
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800">اضافة الفئات</h2>
+                <button onclick="openCategoryModal()" class="w-full sm:w-auto bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 shadow-sm transition">
+                    + إضافة مادة
+                </button>
+            </div>
+            <div>
+                 <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right min-w-[600px]">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="p-4 text-sm font-semibold text-gray-600">الرقم التعريفي</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">الاسم بالعربي</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">الاسم بالفرنسي</th>
+                               
+                            </tr>
+                        </thead>
+                        <tbody id="categories-table-body" class="divide-y divide-gray-100">
+                            <!-- JS Populates this -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </div>
+        </div>
+        
         <!-- Inventory List View -->
         <div id="view-inventory" class="view-section hidden space-y-6">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -210,7 +247,78 @@
         </div>
     </div>
 
+
+
+
+    <!-- MODEL  -->
+     <!-- Category Modal -->
+<div id="category-modal"
+     class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center p-4">
+
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
+
+    <!-- Header -->
+    <div class="p-5 border-b">
+      <h3 class="text-xl font-bold text-gray-800">
+        إضافة / تعديل فئة
+      </h3>
+    </div>
+
+    <!-- Body -->
+    <div class="p-5 space-y-4">
+
+      <!-- Hidden ID (for edit) -->
+      <input type="hidden" id="cat-id">
+
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">
+          الاسم بالعربية
+        </label>
+        <input
+          id="cat-name-ar"
+          type="text"
+          placeholder="مثال: معدات طبية"
+          class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">
+          الاسم بالفرنسية
+        </label>
+        <input
+          id="cat-name-fr"
+          type="text"
+          placeholder="Ex: Équipements médicaux"
+          dir="ltr"
+          class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+        />
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="p-5 border-t bg-gray-50 flex justify-end gap-3 rounded-b-xl">
+
+      <button
+        onclick="closeCategoryModal()"
+        class="px-5 py-2.5 bg-white border rounded-lg text-gray-600 hover:bg-gray-100">
+        إلغاء
+      </button>
+
+      <button
+        onclick="saveCategory()"
+        class="px-6 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 shadow-sm">
+        حفظ
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
     <script src="app.js"></script>
+    <script src="./categories.js"></script>
 </body>
 </html>
 
