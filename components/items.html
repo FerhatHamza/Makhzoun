@@ -1,0 +1,30 @@
+<!-- Inventory List View -->
+        <div id="view-inventory" class="view-section hidden space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800">بطاقات المخزون</h2>
+                <button id="addItemModal" class="w-full sm:w-auto bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 shadow-sm transition">
+                    + إضافة مادة
+                </button>
+            </div>
+            <!-- Responsive Table Container -->
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right min-w-[600px]">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="p-4 text-sm font-semibold text-gray-600">الرمز</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">التسمية</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">FR</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">الفئة</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">الرصيد</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">الحالة</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">العمليات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="items-table-body" class="divide-y divide-gray-100">
+                            <!-- JS Populates this -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>

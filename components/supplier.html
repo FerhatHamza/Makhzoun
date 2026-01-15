@@ -1,0 +1,202 @@
+<!-- قسم الموردين -->
+<div id="view-suppliers" class="view-section hidden space-y-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center">
+            <i class="fas fa-truck-loading text-emerald-600 ml-2"></i>
+            إدارة الموردين
+        </h2>
+        <button
+            id="addSupplierBtn"
+            class="w-full sm:w-auto bg-emerald-600 text-white px-4 py-2.5 rounded-lg hover:bg-emerald-700 shadow-sm transition flex items-center justify-center"
+        >
+            <i class="fas fa-plus-circle ml-2"></i>
+            إضافة مورد جديد
+        </button>
+    </div>
+    
+    <!-- إشعارات -->
+    <div id="supplier-notification" class="hidden p-4 rounded-lg bg-emerald-100 border border-emerald-300 text-emerald-800">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle text-emerald-600 ml-2"></i>
+            <span id="supplier-notification-text"></span>
+            <button onclick="hideSupplierNotification()" class="mr-auto text-emerald-800 hover:text-emerald-900">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div>
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+            <div class="overflow-x-auto">
+                <table class="w-full text-right min-w-[600px]">
+                    <thead class="bg-gray-50 border-b">
+                        <tr>
+                            <th class="p-4 text-sm font-semibold text-gray-600">الرقم التعريفي</th>
+                            <th class="p-4 text-sm font-semibold text-gray-600">اسم المورد</th>
+                            <th class="p-4 text-sm font-semibold text-gray-600">رقم الهاتف</th>
+                            <th class="p-4 text-sm font-semibold text-gray-600">البريد الإلكتروني</th>
+                            <th class="p-4 text-sm font-semibold text-gray-600">العنوان</th>
+                            <th class="p-4 text-sm font-semibold text-gray-600 text-center">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="suppliers-table-body" class="divide-y divide-gray-100">
+                        <!-- سيتم تعبئته بواسطة JavaScript -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-4 text-gray-800 font-medium">1</td>
+                            <td class="p-4 text-gray-800">مؤسسة سوناطراك</td>
+                            <td class="p-4 text-gray-800">023-1234567</td>
+                            <td class="p-4 text-gray-800">contact@sonatrach.dz</td>
+                            <td class="p-4 text-gray-800">الجزائر العاصمة</td>
+                            <td class="p-4">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button onclick="editSupplier(1)" class="text-blue-600 hover:text-blue-800 p-1" title="تعديل">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="deleteSupplier(1)" class="text-red-600 hover:text-red-800 p-1" title="حذف">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-4 text-gray-800 font-medium">2</td>
+                            <td class="p-4 text-gray-800">صيدلية مركزية</td>
+                            <td class="p-4 text-gray-800">021-9876543</td>
+                            <td class="p-4 text-gray-800">info@pharmacie.dz</td>
+                            <td class="p-4 text-gray-800">وهران</td>
+                            <td class="p-4">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button onclick="editSupplier(2)" class="text-blue-600 hover:text-blue-800 p-1" title="تعديل">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="deleteSupplier(2)" class="text-red-600 hover:text-red-800 p-1" title="حذف">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- مودال إضافة/تعديل مورد -->
+<div id="supplier-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+            <!-- رأس المودال -->
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="supplier-modal-title" class="text-xl font-bold text-gray-800">إضافة مورد جديد</h3>
+                <button onclick="closeSupplierModal()" class="text-gray-400 hover:text-gray-600 text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- نموذج المورد -->
+            <form id="supplier-form" class="space-y-4">
+                <input type="hidden" id="supplier-id" value="">
+                
+                <div>
+                    <label for="supplier-name" class="block text-sm font-medium text-gray-700 mb-1">اسم المورد *</label>
+                    <input 
+                        type="text" 
+                        id="supplier-name" 
+                        class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="أدخل اسم المورد"
+                        required
+                    >
+                </div>
+                
+                <div>
+                    <label for="supplier-phone" class="block text-sm font-medium text-gray-700 mb-1">رقم الهاتف</label>
+                    <input 
+                        type="tel" 
+                        id="supplier-phone" 
+                        class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="أدخل رقم الهاتف"
+                    >
+                </div>
+                
+                <div>
+                    <label for="supplier-email" class="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
+                    <input 
+                        type="email" 
+                        id="supplier-email" 
+                        class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="أدخل البريد الإلكتروني"
+                    >
+                </div>
+                
+                <div>
+                    <label for="supplier-address" class="block text-sm font-medium text-gray-700 mb-1">العنوان</label>
+                    <textarea 
+                        id="supplier-address" 
+                        rows="3"
+                        class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="أدخل العنوان"
+                    ></textarea>
+                </div>
+                
+                <div>
+                    <label for="supplier-notes" class="block text-sm font-medium text-gray-700 mb-1">ملاحظات</label>
+                    <textarea 
+                        id="supplier-notes" 
+                        rows="2"
+                        class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="ملاحظات إضافية"
+                    ></textarea>
+                </div>
+                
+                <!-- أزرار المودال -->
+                <div class="flex gap-3 pt-4 border-t">
+                    <button 
+                        type="button"
+                        onclick="closeSupplierModal()"
+                        class="flex-1 border border-gray-300 text-gray-700 rounded-lg p-3 hover:bg-gray-50 transition"
+                    >
+                        إلغاء
+                    </button>
+                    <button 
+                        type="submit"
+                        id="save-supplier-btn"
+                        class="flex-1 bg-emerald-600 text-white rounded-lg p-3 hover:bg-emerald-700 transition"
+                    >
+                        حفظ
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- مودال تأكيد الحذف -->
+<div id="delete-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full">
+        <div class="p-6">
+            <div class="text-center mb-6">
+                <div class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">تأكيد الحذف</h3>
+                <p id="delete-confirm-message" class="text-gray-600">هل أنت متأكد من رغبتك في حذف هذا المورد؟</p>
+            </div>
+            
+            <div class="flex gap-3">
+                <button 
+                    onclick="closeDeleteModal()"
+                    class="flex-1 border border-gray-300 text-gray-700 rounded-lg p-3 hover:bg-gray-50 transition"
+                >
+                    إلغاء
+                </button>
+                <button 
+                    onclick="confirmDelete()"
+                    class="flex-1 bg-red-600 text-white rounded-lg p-3 hover:bg-red-700 transition"
+                >
+                    حذف
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

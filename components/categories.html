@@ -1,0 +1,40 @@
+<!-- categories View -->
+<div id="view-categories" class="view-section space-y-6">
+  <div
+    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+  >
+    <h2  class="text-xl md:text-2xl font-bold text-gray-800">اضافة الفئات</h2>
+    <button
+      id="addCategories"
+      class="w-full sm:w-auto bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 shadow-sm transition"
+    >
+      إضافة فئة جديدة
+      </button>
+  </div>
+  <div>
+    <div
+      class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200"
+    >
+      <div class="overflow-x-auto">
+        <table class="w-full text-right min-w-[600px]">
+          <thead class="bg-gray-50 border-b">
+            <tr>
+              <th class="p-4 text-sm font-semibold text-gray-600">
+                الرقم التعريفي
+              </th>
+              <th class="p-4 text-sm font-semibold text-gray-600">
+                الاسم بالعربي
+              </th>
+              <th class="p-4 text-sm font-semibold text-gray-600">
+                الاسم بالفرنسي
+              </th>
+            </tr>
+          </thead>
+          <tbody id="categories-table-body" class="divide-y divide-gray-100">
+            <!-- JS Populates this -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

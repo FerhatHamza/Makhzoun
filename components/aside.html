@@ -1,0 +1,40 @@
+<!-- Sidebar -->
+    <aside id="sidebar" class="fixed inset-y-0 right-0 z-40 w-64 bg-white shadow-xl transform translate-x-full md:translate-x-0 md:static md:flex md:flex-col transition-transform duration-300 ease-in-out h-full">
+        <div class="p-6 text-center border-b hidden md:block">
+            <h1 class="text-2xl font-bold text-emerald-600"><img src="makhzounlogo.png" alt="Logo of makhzoun"></h1>
+            <p class="text-xs text-gray-500">نظام التسيير المخزون</p>
+        </div>
+        
+        <!-- Mobile Close Button inside Sidebar -->
+        <div class="md:hidden p-4 flex justify-end">
+            <button id="toggleSidebarBtn" class="text-gray-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+            
+            <button  id="btn-dashboard" class="w-full text-right p-3 rounded hover:bg-emerald-50 active-tab transition flex items-center gap-3">
+                <span>📊</span> <span>لوحة القيادة</span>
+            </button>
+            <button  id="btn-categories" class="w-full text-right p-3 rounded hover:bg-emerald-50 active-tab transition flex items-center gap-3">
+                <span>📊</span> <span>ادارة الفئات</span>
+            </button>
+            <button  id="btn-suppliers" class="w-full text-right p-3 rounded hover:bg-emerald-50 active-tab transition flex items-center gap-3">
+                <span>📊</span> <span>ادارة الموردون</span>
+            </button>
+            <button  id="btn-inventory" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
+                <span>📦</span> <span>إدارة المواد</span>
+            </button>
+            <button  id="btn-entry" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
+                <span>📥</span> <span>وصل دخول</span>
+            </button>
+            <button  id="btn-exit" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
+                <span>📤</span> <span>وصل خروج</span>
+            </button>
+            <button  id="btn-reports" class="w-full text-right p-3 rounded hover:bg-emerald-50 transition flex items-center gap-3">
+                <span>📑</span> <span>التقارير والجرد</span>
+            </button>
+        </nav>
+        <div class="p-4 border-t text-xs text-gray-400 text-center hidden md:block">
+            &copy; 2025 Ferhat Hamza.
+        </div>
+    </aside>

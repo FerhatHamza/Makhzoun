@@ -1,0 +1,162 @@
+<!-- Entry View -->
+<div id="view-entry" class="view-section hidden space-y-6 ">
+    <!-- رأس الصفحة -->
+    <header class="mb-8">
+        <div class="flex justify-between items-center mb-2">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
+                <i class="fas fa-boxes text-emerald-600 ml-2"></i>
+                نظام إدارة المخزون
+            </h1>
+            <div class="text-sm text-gray-500">
+                <i class="fas fa-calendar-alt ml-1"></i>
+                <span id="current-date">--/--/----</span>
+            </div>
+        </div>
+        <p class="text-gray-600">تسجيل وصل دخول المواد والمستلزمات</p>
+    </header>
+
+    <!-- إشعارات -->
+    <div id="notification" class="hidden mb-6 p-4 rounded-lg bg-emerald-100 border border-emerald-300 text-emerald-800">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle text-emerald-600 ml-2"></i>
+            <span id="notification-text"></span>
+        </div>
+    </div>
+
+    <!-- قسم تسجيل الوصل -->
+    <div class="glass-effect rounded-xl shadow-lg overflow-hidden mb-8">
+        <div class="p-4 md:p-6">
+            <!-- معلومات الوصل الأساسية -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-truck-loading text-emerald-600 ml-1"></i>
+                        المورد
+                    </label>
+                    <div class="relative">
+                        <select class="w-full border-gray-300 border p-3 rounded-lg form-input focus:border-emerald-500 pr-10 appearance-none" id="entry-supplier">
+                            <option value="" disabled selected>اختر المورد...</option>
+                            <option value="1">مؤسسة سوناطراك</option>
+                            <option value="2">صيدلية مركزية</option>
+                            <option value="3">شركة أدوية الجزائر</option>
+                            <option value="4">مؤسسة إنتاج الأدوية</option>
+                            <option value="5">مورد عام</option>
+                        </select>
+                        <div class="absolute left-3 top-3.5 text-gray-400">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-hashtag text-emerald-600 ml-1"></i>
+                        مرجع الوثيقة
+                    </label>
+                    <input type="text" id="entry-ref" class="w-full border-gray-300 border p-3 rounded-lg form-input focus:border-emerald-500" placeholder="مثال: FAC-001" value="FAC-001">
+                </div>
+            </div>
+            
+            <!-- قسم المواد -->
+            <div class="border-t pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-gray-800 text-lg">
+                        <i class="fas fa-boxes text-emerald-600 ml-2"></i>
+                        المواد
+                    </h3>
+                    
+                </div>
+                
+                <!-- رؤوس الجدول -->
+                <div class="hidden md:grid grid-cols-12 gap-3 mb-3 px-4 text-sm text-gray-600 font-medium">
+                    <div class="col-span-4">المادة</div>
+                    <div class="col-span-2">الكمية</div>
+                    <div class="col-span-2">السعر (دج)</div>
+                    <div class="col-span-3">تاريخ الصلاحية</div>
+                    <div class="col-span-1 text-center">إجراءات</div>
+                </div>
+                
+                <!-- عناصر المواد -->
+                <div id="entry-items-container" class="space-y-4">
+                    <!-- صف مادة (مثال) -->
+                    <div class="item-row bg-white p-4 rounded-xl border border-gray-200 shadow-sm grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                        <div class="md:col-span-4">
+                            <label class="block text-xs text-gray-500 mb-1 md:hidden">المادة</label>
+                            <div class="relative">
+                                <select id="firstRow" class="w-full border p-3 rounded-lg form-input focus:border-emerald-500 item-select-entry appearance-none pr-10">
+                                    
+                                </select>
+                                <div class="absolute left-3 top-3.5 text-gray-400">
+                                    <i class="fas fa-pills"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs text-gray-500 mb-1 md:hidden">الكمية</label>
+                            <input type="number" placeholder="الكمية" class="w-full border p-3 rounded-lg form-input focus:border-emerald-500 entry-qty" value="10" min="1">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs text-gray-500 mb-1 md:hidden">السعر (دج)</label>
+                            <div class="relative">
+                                <input type="number" placeholder="السعر" class="w-full border p-3 rounded-lg form-input focus:border-emerald-500 entry-price pr-10" value="2500" min="0" step="0.01">
+                                <div class="absolute left-3 top-3.5 text-gray-400">دج</div>
+                            </div>
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-xs text-gray-500 mb-1 md:hidden">تاريخ الصلاحية</label>
+                            <div class="relative">
+                                <input type="date" class="w-full border p-3 rounded-lg form-input focus:border-emerald-500 entry-expiry" value="2024-12-31">
+                                <div class="absolute left-3 top-3.5 text-gray-400">
+                                    <i class="far fa-calendar"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md:col-span-1 flex justify-center">
+                            <button type="button" class="remove-btn text-gray-400 hover:text-red-500 p-2" onclick="removeEntryRow(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                </svg>
+
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- زر إضافة مادة -->
+                <button id="addEntryRow" class="mt-5 w-full md:w-auto text-emerald-600 font-medium py-3 px-5 rounded-lg border border-emerald-300 hover:bg-emerald-50 transition duration-300 flex items-center justify-center">
+                    <i class="fas fa-plus-circle ml-2"></i>
+                    إضافة مادة جديدة
+                </button>
+                
+                <!-- ملخص التكلفة -->
+                <div class="total-box mt-8 p-5 rounded-xl">
+                    <div class="flex flex-col md:flex-row justify-between items-center">
+                        <div class="mb-4 md:mb-0">
+                            <h4 class="font-bold text-gray-800">
+                                <i class="fas fa-calculator text-emerald-600 ml-2"></i>
+                                ملخص التكلفة
+                            </h4>
+                            <p class="text-gray-600 text-sm">إجمالي تكلفة المواد المدخلة</p>
+                        </div>
+                        <div class="text-center md:text-left">
+                            <div class="text-3xl font-bold text-emerald-700" id="total-cost">25,000 دج</div>
+                            <div class="text-gray-500 text-sm">ضريبة القيمة المضافة غير مشمولة</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أزرار الإجراءات -->
+            <div class="mt-10 pt-6 border-t flex flex-col md:flex-row justify-end gap-4">
+                <button onclick="resetForm()" class="px-6 py-3 rounded-lg font-medium border border-gray-300 text-gray-700 hover:bg-gray-50 transition duration-300 flex items-center justify-center order-2 md:order-1">
+                    <i class="fas fa-redo ml-2"></i>
+                    مسح النموذج
+                </button>
+                <button onclick="submitEntry()" class="btn-primary px-8 py-3 rounded-lg font-bold text-white shadow-md flex items-center justify-center order-1 md:order-2">
+                    <i class="fas fa-save ml-2"></i>
+                    حفظ الوصل
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

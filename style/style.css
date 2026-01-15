@@ -1,0 +1,56 @@
+.glass-effect {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.form-input:focus {
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
+}
+
+.item-row {
+    transition: all 0.2s ease;
+}
+
+.item-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.3);
+}
+
+.remove-btn {
+    transition: all 0.2s ease;
+}
+
+.remove-btn:hover {
+    color: #ef4444;
+    transform: scale(1.1);
+}
+
+.total-box {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 1px solid #bbf7d0;
+}
+
+/* تحسينات للعرض على الجوال */
+@media (max-width: 640px) {
+    .mobile-stack {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+
+    .mobile-full {
+        width: 100% !important;
+        margin-bottom: 1rem;
+    }
+}
