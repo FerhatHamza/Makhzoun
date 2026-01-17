@@ -1,17 +1,46 @@
 <div id="view-dashboard" class="view-section space-y-6">
-    <h2 class="text-xl md:text-2xl font-bold text-gray-800">نظرة عامة</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-        <div class="bg-white p-6 rounded-lg shadow-sm border-r-4 border-blue-500">
-            <h3 class="text-gray-500 text-sm font-medium">إجمالي المواد</h3>
-            <p class="text-3xl font-bold mt-2 text-gray-800" id="stat-total">0</p>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-sm border-r-4 border-red-500">
-            <h3 class="text-gray-500 text-sm font-medium">تنبيهات نفاذ المخزون</h3>
-            <p class="text-3xl font-bold mt-2 text-red-600" id="stat-low">0</p>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-sm border-r-4 border-green-500">
-            <h3 class="text-gray-500 text-sm font-medium">قيمة المخزون (دج)</h3>
-            <p class="text-2xl md:text-3xl font-bold mt-2 text-gray-800 truncate" id="stat-value">0.00</p>
-        </div>
+  <h2 class="text-xl md:text-2xl font-bold text-gray-800">نظرة عامة</h2>
+
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
+
+    <!-- Total Items -->
+    <div class="bg-white p-5 rounded-lg shadow-sm border-r-4 border-blue-500">
+      <h3 class="text-gray-500 text-sm font-medium">إجمالي المواد</h3>
+      <p class="text-3xl font-bold mt-2 text-gray-800" id="stat-total">0</p>
     </div>
+
+    <!-- Low Stock -->
+    <div class="bg-white p-5 rounded-lg shadow-sm border-r-4 border-red-500">
+      <h3 class="text-gray-500 text-sm font-medium">تنبيهات نفاذ المخزون</h3>
+      <p class="text-3xl font-bold mt-2 text-red-600" id="stat-low">0</p>
+    </div>
+
+    <!-- Stock Value -->
+    <div class="bg-white p-5 rounded-lg shadow-sm border-r-4 border-green-500">
+      <h3 class="text-gray-500 text-sm font-medium">قيمة المخزون (دج)</h3>
+      <p class="text-2xl md:text-3xl font-bold mt-2 text-gray-800 truncate" id="stat-value">
+        0.00
+      </p>
+    </div>
+
+    <!-- Suppliers -->
+    <div class="bg-white p-5 rounded-lg shadow-sm border-r-4 border-purple-500">
+      <h3 class="text-gray-500 text-sm font-medium">عدد الموردين</h3>
+      <p class="text-3xl font-bold mt-2 text-gray-800" id="stat-suppliers">0</p>
+    </div>
+
+    <!-- Categories -->
+    <div class="bg-white p-5 rounded-lg shadow-sm border-r-4 border-amber-500">
+      <h3 class="text-gray-500 text-sm font-medium">عدد الفئات</h3>
+      <p class="text-3xl font-bold mt-2 text-gray-800" id="stat-categories">0</p>
+    </div>
+
+    <!-- Users (صف جديد تلقائيًا على الشاشات الصغيرة) -->
+    <div class="bg-white p-5 rounded-lg shadow-sm border-r-4 border-cyan-500 sm:col-span-2 lg:col-span-1">
+      <h3 class="text-gray-500 text-sm font-medium">عدد المستخدمين</h3>
+      <p class="text-3xl font-bold mt-2 text-gray-800" id="stat-users">0</p>
+    </div>
+
+  </div>
 </div>

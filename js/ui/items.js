@@ -1,11 +1,12 @@
 import { entryInit } from "./entry.js";
 import { openModal } from "./modal.js";
+import { loadCategoriesIntoCombo } from "./index.js";
 import { getItems, deleteItems, editItem, changeExpiryTrack } from "../api/itemsAPI.js";
 
 export async function loadItemsUI() {
     const items = await getItems();
     const tbody = document.getElementById("items-table-body");
-    console.log(items);
+    console.log("items loaded:", items);
     tbody.innerHTML = "";
 
     if (!items.length) {
@@ -86,8 +87,8 @@ async function toggleExpiry() {
   });
 }
 
-function editItemUI(item) {
-  console.log(item);
+async function editItemUI(item) {
+
   const wrapper = document.createElement('div');
 
   wrapper.className = 'space-y-6 text-right';
@@ -109,13 +110,12 @@ function editItemUI(item) {
 
       <div>
         <label class="block text-sm text-gray-600 mb-1">الفئة</label>
-        <input
-          id="item-category"
-          value="فئة"
-          type="text"
-          placeholder="مثال: معدات طبية"
-          class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-        />
+        <select
+          id="item-categoryEdit"
+          class="w-full border p-3 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 outline-none"
+        >
+          <option value="">— اختر الفئة —</option>
+        </select>
       </div>
 
     </div>
@@ -149,14 +149,33 @@ function editItemUI(item) {
 
       <div>
         <label class="block text-sm text-gray-600 mb-1">الوحدة</label>
-        <input
+        <select
           id="item-unit"
-          value="${item.unit}"
-          type="text"
-          placeholder="عدد/كيلو/لتر"
-          dir="ltr"
-          class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-        />
+          class="w-full border p-3 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 outline-none"
+        >
+          <option value="">— اختر الفئة —</option>
+          <option value="number"> عدد </option>
+          <option value="kilogram"> كيلو </option>
+          <option value="liter"> لتر </option>
+          <option value="meter"> متر </option>
+          <option value="box"> علبة </option>
+          <option value="packet"> كيس </option>
+          <option value="piece"> قطعة </option>
+          <option value="set"> طقم </option>
+          <option value="other"> أخرى </option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">تاريخ انتهاء الصلاحية</label>
+        <select
+          id="item-expiry"
+          value="${item.expiry}"
+          class="w-full border p-3 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 outline-none"
+        >
+          <option value="yes">نعم</option>
+          <option value="no"> لا </option>
+        </select>
       </div>
 
     </div>
@@ -200,31 +219,23 @@ function editItemUI(item) {
     </div>
 
     <!-- EXTRA -->
-    <div class="grid grid-cols-2 gap-4">
+    <div class="">
 
       <div>
         <label class="block text-sm text-gray-600 mb-1">المواصفات الفنية</label>
         <textarea
           id="item-specs"
-          value="${item.specs}"
           rows="3"
           placeholder="وصف مختصر للمواصفات"
           class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none resize-none"
-        ></textarea>
+        >${item.technical_specs}</textarea>
       </div>
 
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">تاريخ انتهاء الصلاحية</label>
-        <input
-          id="item-expiry"
-          value="${item.expiry_date}"
-          type="date"
-          class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-        />
-      </div>
+      
 
     </div>
   `;
+  
 
   openModal({
     modalTitle: 'تعديل فئة',
@@ -241,7 +252,7 @@ function editItemUI(item) {
       const specs = document.getElementById('item-specs').value;
       const expiry = document.getElementById('item-expiry').value;
 
-      console.log(item.id, code, category, nameAr, nameFr, unit, minStock, initialStock, currentStock, specs, expiry);
+      
 
       await editItem(item.id, code, category, nameAr, nameFr, unit, minStock, initialStock, currentStock, specs, expiry);
       await loadItemsUI();
@@ -250,6 +261,14 @@ function editItemUI(item) {
       // call model / api here
     }
   });
+
+  await loadCategoriesIntoCombo('item-categoryEdit').then(() => {
+    document.getElementById('item-categoryEdit').value = item.category_id || '';
+  });
+
+  document.getElementById('item-unit').value = item.unit || '';
+  document.getElementById('item-expiry').value = item.expiry ? 'yes' : 'no';
+  
 }
 
 function deleteItem(item) {

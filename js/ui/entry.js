@@ -1,4 +1,6 @@
-import { getItems } from "./../api/itemsAPI.js";
+import { getItems, getSuppliers } from "./../api/itemsAPI.js";
+import { createMovement } from "./../api/movements.js";
+
 // متغيرات عامة
 let itemCount = 1;
 
@@ -19,16 +21,14 @@ function getElements() {
 // دالة إضافة صف مادة جديد
 async function addEntryRow() {
     
-    
+    const { container } = getElements();
     const newRow = document.createElement('div');
     newRow.className = 'item-row bg-white p-4 rounded-xl border border-gray-200 shadow-sm grid grid-cols-1 md:grid-cols-12 gap-4 items-end';
     
     // تاريخ افتراضي (سنة من اليوم)
-    const defaultDate = new Date();
-    defaultDate.setFullYear(defaultDate.getFullYear() + 1);
-    const defaultDateString = defaultDate.toISOString().split('T')[0];
+   
     const items = await getItemsData();
-
+    const today = new Date().toISOString().split('T')[0];
     newRow.innerHTML = `
         <div class="md:col-span-4">
             <label class="block text-xs text-gray-500 mb-1 md:hidden">المادة</label>
@@ -57,7 +57,7 @@ async function addEntryRow() {
         <div class="md:col-span-3">
             <label class="block text-xs text-gray-500 mb-1 md:hidden">تاريخ الصلاحية</label>
             <div class="relative">
-                <input type="date" class="w-full border p-3 rounded-lg form-input focus:border-emerald-500 entry-expiry" value="${defaultDateString}">
+                <input type="date" class="w-full border p-3 rounded-lg form-input focus:border-emerald-500 entry-expiry" value="${today}">
                 <div class="absolute left-3 top-3.5 text-gray-400">
                     <i class="far fa-calendar"></i>
                 </div>
@@ -145,8 +145,9 @@ function showNotification(message) {
 }
 
 // دالة مسح النموذج
-function resetForm() {
-    if (confirm('هل أنت متأكد من رغبتك في مسح جميع البيانات؟')) {
+function resetForm(vif) {
+   
+    if (vif === true || confirm('هل أنت متأكد من رغبتك في مسح جميع البيانات؟')) {
         const { entrySupplier, entryRef, container, totalCostDisplay } = getElements();
         
         entrySupplier.selectedIndex = 0;
@@ -171,7 +172,7 @@ function resetForm() {
 }
 
 // دالة حفظ الوصل
-function submitEntry() {
+async function submitEntry() {
     const { entrySupplier, entryRef } = getElements();
     const supplier = entrySupplier.value;
     const ref = entryRef.value.trim();
@@ -233,13 +234,34 @@ function submitEntry() {
         total: document.getElementById('total-cost')?.textContent || '0 دج'
     });
 
+    const movementsPayload = items.map(item => ({
+        item_id: item.material,
+        quantity: item.qty,
+        unit_price: item.price,
+        ref_doc_type: 'bill',
+        ref_doc_number: ref,
+        // shared movement data
+        type: 'IN',
+        date: item.expiry,
+        destination_id: null,
+        supplier_id: supplier,
+        notes: ''
+    }));
+
+    const movement = createMovement(movementsPayload).then(() => {
+        showNotification('تم حفظ الوصل بنجاح!');
+        resetForm(true);
+    }).catch(err => {
+        showNotification('حدث خطأ أثناء حفظ الوصل.');
+        console.error("Error creating movements:", err);
+    });
     // عرض إشعار النجاح
     showNotification('تم حفظ الوصل بنجاح!');
 }
 
 // تهيئة قسم الوصل
 export async function entryInit() {
-    const { btnAddRow } = getElements();
+    const { btnAddRow, entrySupplier } = getElements();
     
     if (btnAddRow) {
         btnAddRow.addEventListener('click', addEntryRow);
@@ -279,11 +301,23 @@ export async function entryInit() {
             ${items.map(item => `<option value="${item.id}">${item.name_ar}</option>`).join('')}
         `;
     }
+    getSuppliers().then(suppliers => {
+        entrySupplier.innerHTML = `
+            <option value="" disabled selected>اختر المورد...</option>
+            ${suppliers.map(supplier => `<option value="${supplier.id}">${supplier.name_ar} (${supplier.name_fr})</option>`).join('')}
+        `;
+    });
 
+    setDate();
+    
     // حساب التكلفة الإجمالية الأولية
     calculateTotal();
 }
 
+function setDate() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dateNowInput1').value = today;
+}
 
 async function getItemsData() {
     const items = await getItems();

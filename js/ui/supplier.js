@@ -1,24 +1,8 @@
+import { getSupplierAPI, createSupplierAPI, editSupplierAPI } from "./../api/supplierAPI.js";
+
 // متغيرات عامة
 let currentSupplierId = null;
-let suppliersData = [
-    {
-        id: 1,
-        name: 'مؤسسة سوناطراك',
-        phone: '023-1234567',
-        email: 'contact@sonatrach.dz',
-        address: 'الجزائر العاصمة',
-        notes: 'مورد رئيسي للمواد الطبية'
-    },
-    {
-        id: 2,
-        name: 'صيدلية مركزية',
-        phone: '021-9876543',
-        email: 'info@pharmacie.dz',
-        address: 'وهران',
-        notes: ''
-    }
-];
-
+let suppliersData = [];
 // الحصول على العناصر
 function getSupplierElements() {
     return {
@@ -30,11 +14,12 @@ function getSupplierElements() {
         // عناصر النموذج
         supplierForm: document.getElementById('supplier-form'),
         supplierId: document.getElementById('supplier-id'),
-        supplierName: document.getElementById('supplier-name'),
+        supplierCode: document.getElementById('supplier-code'),
+        supplierNameAr: document.getElementById('supplier-name_ar'),
+        supplierNameFr: document.getElementById('supplier-name_fr'),
         supplierPhone: document.getElementById('supplier-phone'),
-        supplierEmail: document.getElementById('supplier-email'),
+
         supplierAddress: document.getElementById('supplier-address'),
-        supplierNotes: document.getElementById('supplier-notes'),
         modalTitle: document.getElementById('supplier-modal-title'),
         saveBtn: document.getElementById('save-supplier-btn'),
         
@@ -47,7 +32,7 @@ function getSupplierElements() {
 }
 
 // تهيئة قسم الموردين
-export function suppliersInit() {
+export async function suppliersInit() {
     const { addSupplierBtn, supplierForm } = getSupplierElements();
     
     // إضافة مستمعات الأحداث
@@ -64,27 +49,32 @@ export function suppliersInit() {
 }
 
 // عرض الموردين في الجدول
-function renderSuppliersTable() {
+async function renderSuppliersTable() {
     const { tableBody } = getSupplierElements();
     if (!tableBody) return;
     
     // فرز الموردين حسب ID
-    const sortedSuppliers = [...suppliersData].sort((a, b) => a.id - b.id);
-    
-    tableBody.innerHTML = sortedSuppliers.map(supplier => `
+    const getSuppliers = await getSupplierAPI();
+    suppliersData = getSuppliers.sort((a, b) => a.id - b.id);
+    // code, name_ar, name_fr, phone, address
+    tableBody.innerHTML = suppliersData.map(supplier => `
         <tr class="hover:bg-gray-50" data-id="${supplier.id}">
-            <td class="p-4 text-gray-800 font-medium">${supplier.id}</td>
-            <td class="p-4 text-gray-800">${supplier.name}</td>
+            <td class="p-4 text-gray-800 font-medium">${supplier.code}</td>
+            <td class="p-4 text-gray-800">${supplier.name_ar}</td>
+            <td class="p-4 text-gray-800">${supplier.name_fr}</td>
             <td class="p-4 text-gray-800">${supplier.phone || '-'}</td>
-            <td class="p-4 text-gray-800">${supplier.email || '-'}</td>
             <td class="p-4 text-gray-800">${supplier.address || '-'}</td>
             <td class="p-4">
                 <div class="flex items-center justify-center gap-2">
                     <button onclick="editSupplier(${supplier.id})" class="text-blue-600 hover:text-blue-800 p-1 transition duration-200" title="تعديل">
-                        <i class="fas fa-edit"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                     </button>
                     <button onclick="showDeleteModal(${supplier.id})" class="text-red-600 hover:text-red-800 p-1 transition duration-200" title="حذف">
-                        <i class="fas fa-trash-alt"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                        </svg>
+
                     </button>
                 </div>
             </td>
@@ -93,7 +83,7 @@ function renderSuppliersTable() {
 }
 
 // فتح مودال الإضافة/التعديل
-function openSupplierModal(mode, supplierId = null) {
+function openSupplierModal(mode, supplier) {
     const elements = getSupplierElements();
     
     if (mode === 'add') {
@@ -103,28 +93,26 @@ function openSupplierModal(mode, supplierId = null) {
         
         // مسح الحقول
         elements.supplierId.value = '';
-        elements.supplierName.value = '';
+        elements.supplierNameAr.value = '';
+        elements.supplierNameFr.value = '';
         elements.supplierPhone.value = '';
-        elements.supplierEmail.value = '';
         elements.supplierAddress.value = '';
-        elements.supplierNotes.value = '';
         
         currentSupplierId = null;
-    } else if (mode === 'edit' && supplierId) {
+    } else if (mode === 'edit' && supplier) {
         // وضع التعديل
         elements.modalTitle.textContent = 'تعديل مورد';
         elements.saveBtn.textContent = 'حفظ التغييرات';
         
         // البحث عن المورد
-        const supplier = suppliersData.find(s => s.id === supplierId);
         if (supplier) {
-            currentSupplierId = supplierId;
+            currentSupplierId = supplier.id;
             elements.supplierId.value = supplier.id;
-            elements.supplierName.value = supplier.name;
+            elements.supplierCode.value = supplier.code;
+            elements.supplierNameAr.value = supplier.name_ar;
+            elements.supplierNameFr.value = supplier.name_fr;
             elements.supplierPhone.value = supplier.phone || '';
-            elements.supplierEmail.value = supplier.email || '';
             elements.supplierAddress.value = supplier.address || '';
-            elements.supplierNotes.value = supplier.notes || '';
         }
     }
     
@@ -134,7 +122,7 @@ function openSupplierModal(mode, supplierId = null) {
     
     // التركيز على أول حقل
     setTimeout(() => {
-        elements.supplierName.focus();
+        elements.supplierNameAr.focus();
     }, 100);
 }
 
@@ -147,25 +135,27 @@ function closeSupplierModal() {
 
 // معالجة تقديم النموذج
 function handleSupplierSubmit(e) {
+    console.log("Submitting supplier form...");
     e.preventDefault();
     
     const elements = getSupplierElements();
-    const name = elements.supplierName.value.trim();
+    const nameAr = elements.supplierNameAr.value.trim();
+    const nameFr = elements.supplierNameFr.value.trim();
     
     // التحقق من الاسم
-    if (!name) {
-        showSupplierNotification('الرجاء إدخال اسم المورد', 'error');
-        elements.supplierName.focus();
+    if (!nameAr) {
+        showSupplierNotification('الرجاء إدخال اسم المورد بالعربي', 'error');
+        elements.supplierNameAr.focus();
         return;
     }
     
     // إعداد بيانات المورد
     const supplierData = {
-        name: name,
+        code: elements.supplierCode.value.trim(),
+        name_ar: nameAr,
+        name_fr: nameFr,
         phone: elements.supplierPhone.value.trim(),
-        email: elements.supplierEmail.value.trim(),
         address: elements.supplierAddress.value.trim(),
-        notes: elements.supplierNotes.value.trim()
     };
     
     if (currentSupplierId) {
@@ -181,35 +171,21 @@ function handleSupplierSubmit(e) {
 }
 
 // إضافة مورد جديد
-function addSupplier(data) {
-    // إنشاء ID جديد
-    const newId = suppliersData.length > 0 
-        ? Math.max(...suppliersData.map(s => s.id)) + 1 
-        : 1;
-    
-    const newSupplier = {
-        id: newId,
-        ...data
-    };
-    
-    suppliersData.push(newSupplier);
+async function addSupplier(data) {
+   
+    console.log("Adding new supplier:", data);
+    const supp = await createSupplierAPI(data.code, data.name_ar, data.name_fr, data.phone, data.address);
     renderSuppliersTable();
     showSupplierNotification('تم إضافة المورد بنجاح');
 }
 
 // تحديث مورد موجود
-function updateSupplier(id, data) {
-    const index = suppliersData.findIndex(s => s.id === id);
+async function updateSupplier(id, data) {
+    console.log("Updating supplier ID:", id, "with data:", data);
+    const supp = await editSupplierAPI(id, data.code, data.name_ar, data.name_fr, data.phone, data.address);
+    renderSuppliersTable();
+    showSupplierNotification('تم تحديث بيانات المورد بنجاح');
     
-    if (index !== -1) {
-        suppliersData[index] = {
-            ...suppliersData[index],
-            ...data
-        };
-        
-        renderSuppliersTable();
-        showSupplierNotification('تم تحديث بيانات المورد بنجاح');
-    }
 }
 
 // فتح مودال حذف المورد
@@ -250,8 +226,11 @@ function confirmDelete() {
 }
 
 // دالة تعديل المورد (للأزرار في الجدول)
-function editSupplier(id) {
-    openSupplierModal('edit', id);
+function editSupplier(supplierId) {
+    const supplier = suppliersData.find(s => s.id === supplierId);
+    console.log("Editing supplier:", supplier);
+    
+    openSupplierModal('edit', supplier);
 }
 
 // دالة حذف المورد (للأزرار في الجدول)
@@ -260,7 +239,7 @@ function deleteSupplier(id) {
     showDeleteModal(id);
 }
 
-// عرض إشعار
+// عرض إشعار 
 function showSupplierNotification(message, type = 'success') {
     const { notification, notificationText } = getSupplierElements();
     

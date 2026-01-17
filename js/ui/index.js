@@ -121,8 +121,8 @@ function addModels() {
 
 
 
-async function loadCategoriesIntoCombo() {
-  const select = document.getElementById('item-category');
+export async function loadCategoriesIntoCombo(id) {
+  const select = document.getElementById(id);
   const categories = await getCategoriesNames();
 
   categories.forEach(cat => {
@@ -193,13 +193,33 @@ async function createItemsForm() {
 
       <div>
         <label class="block text-sm text-gray-600 mb-1">الوحدة</label>
-        <input
+        
+        <select
           id="item-unit"
-          type="text"
-          placeholder="عدد/كيلو/لتر"
-          dir="ltr"
-          class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-        />
+          class="w-full border p-3 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 outline-none"
+        >
+          <option value="">— اختر الفئة —</option>
+          <option value="number"> عدد </option>
+          <option value="kilogram"> كيلو </option>
+          <option value="liter"> لتر </option>
+          <option value="meter"> متر </option>
+          <option value="box"> علبة </option>
+          <option value="packet"> كيس </option>
+          <option value="piece"> قطعة </option>
+          <option value="set"> طقم </option>
+          <option value="other"> أخرى </option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">هل لديه تاريخ انتهاء الصلاحية</label>
+        <select
+          id="item-expiry"
+          class="w-full border p-3 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 outline-none"
+        >
+          <option value="yes">نعم</option>
+          <option value="no"> لا </option>
+        </select>
       </div>
 
     </div>
@@ -240,7 +260,7 @@ async function createItemsForm() {
     </div>
 
     <!-- EXTRA -->
-    <div class="grid grid-cols-2 gap-4">
+    <div class="">
 
       <div>
         <label class="block text-sm text-gray-600 mb-1">المواصفات الفنية</label>
@@ -251,16 +271,7 @@ async function createItemsForm() {
           class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none resize-none"
         ></textarea>
       </div>
-
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">تاريخ انتهاء الصلاحية</label>
-        <input
-          id="item-expiry"
-          type="date"
-          class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-        />
-      </div>
-
+      
     </div>
   `;
  
@@ -295,12 +306,12 @@ async function createItemsForm() {
         false
       );
       await loadItemsUI();
-      console.log('Adding item:', data);
+      
       // call model / api here
     }
   });
 
-  await loadCategoriesIntoCombo();
+  await loadCategoriesIntoCombo('item-category');
 }
 
 

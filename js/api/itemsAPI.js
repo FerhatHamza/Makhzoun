@@ -33,3 +33,8 @@ export async function changeExpiryTrack(id, expiryTrack) {
     const items = await api.update("expiry-track", id, { expiry_track: expiryTrack });
     return items;
 }
+
+export async function getSuppliers() {
+    const suppliers = await api.getAll("suppliers");
+    return suppliers;
+}
